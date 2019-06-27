@@ -1,0 +1,39 @@
+{
+  "api": {
+    "require_startup_execution": false,
+    "class_name": "com.applicaster.liveswitcher.LiveSwitcherContract"
+  },
+  "dependency_repository_url": [
+
+  ],
+  "platform": "android",
+  "author_name": "Juan Hernandez",
+  "author_email": "j.hernandez@applicaster.com",
+  "manifest_version": "0.0.1",
+  "name": "LiveSwitcher",
+  "description": "Native live switcher",
+  "type": "general",
+  "screen": true,
+  "identifier": "LiveSwitcher",
+  "ui_builder_support": true,
+  "dependency_name": "com.applicaster:LiveSwitcher-Android",
+  "dependency_version": "0.0.1",
+  "whitelisted_account_ids": [
+    "5a53d5ec9349a1000ecadf69"
+  ],
+  "min_zapp_sdk": "8.0.0",
+  "deprecated_since_zapp_sdk": "",
+  "unsupported_since_zapp_sdk": "",
+  "react_native": false,
+  "custom_configuration_fields": [
+
+  ],
+  "data": {
+    "fields": [
+    {
+      "key": "source",
+      "type": "text_input"
+    }
+     ]
+  }
+}
