@@ -17,6 +17,7 @@ import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.util.ui.Toaster
+import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
@@ -38,9 +39,10 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                     override fun onResult(atom: Any) {
                         Log.d(this.javaClass.simpleName, "onResult")
                         if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
+                            var programs = LiveSwitcherUtil
+                                    .getProgramsFromAtomEntries(atom.entries as ArrayList<APAtomEntry>)
                             rv_programs.layoutManager = LinearLayoutManager(context)
-                            rv_programs.adapter = ProgramAdapter(LiveSwitcherUtil
-                                    .getProgramsFromAtomEntries(atom.entries as ArrayList<APAtomEntry>),
+                            rv_programs.adapter = ProgramAdapter(programs,
                                     context, this@LiveSwitcherFragment)
                         }
                     }
@@ -54,6 +56,8 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
     }
 
     override fun onProgramClicked(programId: String) {
-        Toaster.makeToast(context, "the click got through")
+        iv_player.visibility = View.VISIBLE
+        Glide.with(this@LiveSwitcherFragment)
+                .asDrawable().load(programId).into(iv_player)
     }
 }

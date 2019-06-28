@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ProgramModel
 import com.applicaster.util.ui.Toaster
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_program.view.*
 
 class ProgramAdapter(val items: List<ProgramModel.Program>, val context: Context?,
@@ -22,9 +23,11 @@ class ProgramAdapter(val items: List<ProgramModel.Program>, val context: Context
 
     override fun onBindViewHolder(holder: ProgramViewHolder, position: Int) {
         holder.tvProgramName.text = items[position].name
+        context?.let {
+            Glide.with(context).asDrawable().load(items[position].coverImg).into(holder.ivImage)
+        }
         holder.itemView.setOnClickListener {
-            Toaster.makeToast(context, "item clicked")
-            listener.onProgramClicked("programId")
+            listener.onProgramClicked(items[position].coverImg)
         }
     }
 
@@ -37,4 +40,5 @@ class ProgramAdapter(val items: List<ProgramModel.Program>, val context: Context
 
 class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvProgramName = view.tv_program_name
+    var ivImage = view.iv_image
 }
