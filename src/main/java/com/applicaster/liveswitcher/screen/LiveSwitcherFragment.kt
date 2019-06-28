@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.app.Fragment
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
@@ -42,9 +44,17 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                     override fun onResult(atom: Any) {
                         Log.d(this.javaClass.simpleName, "onResult")
                         if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
-                            rv_programs.layoutManager = LinearLayoutManager(context)
-                            rv_programs.adapter = ProgramAdapter(atom.entries,
-                                    context, this@LiveSwitcherFragment)
+                            rv_live.layoutManager = LinearLayoutManager(context)
+                            rv_live.adapter = ProgramAdapter(LiveSwitcherUtil
+                                    .getLiveAtoms(atom.entries as ArrayList<APAtomEntry>),
+                                    context, this@LiveSwitcherFragment, true)
+                            ViewCompat.setNestedScrollingEnabled(rv_live, false)
+
+                            rv_next.layoutManager = LinearLayoutManager(context)
+                            rv_next.adapter = ProgramAdapter(LiveSwitcherUtil
+                                    .getNextAtoms(atom.entries as ArrayList<APAtomEntry>),
+                                    context, this@LiveSwitcherFragment, false)
+                            ViewCompat.setNestedScrollingEnabled(rv_next, false)
                         }
                     }
 
@@ -62,18 +72,11 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                 .asDrawable().load(atomEntry.mediaGroups[0].mediaItems[0].src).into(iv_image)
         val playersManager = PlayersManager.getInstance()
         val playerContract = playersManager.createPlayer(atomEntry.playable, context)
-        if(playerContract != null) {
+        if (playerContract != null) {
             playerContract.attachInline(rl_player)
-            playerContract.playInline(getConfigurationFromPlayable(atomEntry.playable))
+            playerContract.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
         }
-
     }
 
-    fun getConfigurationFromPlayable(playable: Playable) : PlayableConfiguration {
-        var configuration = PlayableConfiguration()
-        val adsConfiguration = AdsConfiguration()
-        adsConfiguration.extensionName = VideoAdsUtil.getPrerollExtension(playable.isLive, true)
-        configuration.adsConfiguration = adsConfiguration
-        return configuration
-    }
+
 }
