@@ -15,8 +15,11 @@ import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
-import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
-import com.applicaster.util.ui.Toaster
+import com.applicaster.player.VideoAdsUtil
+import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
+import com.applicaster.plugin_manager.playersmanager.Playable
+import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
+import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
@@ -39,10 +42,8 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                     override fun onResult(atom: Any) {
                         Log.d(this.javaClass.simpleName, "onResult")
                         if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
-                            var programs = LiveSwitcherUtil
-                                    .getProgramsFromAtomEntries(atom.entries as ArrayList<APAtomEntry>)
                             rv_programs.layoutManager = LinearLayoutManager(context)
-                            rv_programs.adapter = ProgramAdapter(programs,
+                            rv_programs.adapter = ProgramAdapter(atom.entries,
                                     context, this@LiveSwitcherFragment)
                         }
                     }
@@ -55,9 +56,24 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
         }
     }
 
-    override fun onProgramClicked(programId: String) {
-        iv_player.visibility = View.VISIBLE
+    override fun onProgramClicked(atomEntry: APAtomEntry) {
+        iv_image.visibility = View.VISIBLE
         Glide.with(this@LiveSwitcherFragment)
-                .asDrawable().load(programId).into(iv_player)
+                .asDrawable().load(atomEntry.mediaGroups[0].mediaItems[0].src).into(iv_image)
+        val playersManager = PlayersManager.getInstance()
+        val playerContract = playersManager.createPlayer(atomEntry.playable, context)
+        if(playerContract != null) {
+            playerContract.attachInline(rl_player)
+            playerContract.playInline(getConfigurationFromPlayable(atomEntry.playable))
+        }
+
+    }
+
+    fun getConfigurationFromPlayable(playable: Playable) : PlayableConfiguration {
+        var configuration = PlayableConfiguration()
+        val adsConfiguration = AdsConfiguration()
+        adsConfiguration.extensionName = VideoAdsUtil.getPrerollExtension(playable.isLive, true)
+        configuration.adsConfiguration = adsConfiguration
+        return configuration
     }
 }

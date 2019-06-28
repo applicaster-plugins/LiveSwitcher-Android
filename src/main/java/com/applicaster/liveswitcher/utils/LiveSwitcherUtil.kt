@@ -16,7 +16,8 @@ class LiveSwitcherUtil {
                            it.extensions?.get("applicaster_channel_id").toString(),
                            it.mediaGroups[0].mediaItems[0].src,
                            it.title,
-                           it.summary))
+                           it.summary,
+                           it.content.src))
             }
 
             return programs
