@@ -6,6 +6,7 @@ import android.os.Looper
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
 import com.applicaster.liveswitcher.R
+import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.player.VideoAdsUtil
@@ -44,17 +46,16 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                     override fun onResult(atom: Any) {
                         Log.d(this.javaClass.simpleName, "onResult")
                         if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
-                            rv_live.layoutManager = LinearLayoutManager(context)
-                            rv_live.adapter = ProgramAdapter(LiveSwitcherUtil
-                                    .getLiveAtoms(atom.entries as ArrayList<APAtomEntry>),
-                                    context, this@LiveSwitcherFragment, true)
-                            ViewCompat.setNestedScrollingEnabled(rv_live, false)
+                            // get channels
+                            val channels = LiveSwitcherUtil.getChannelsFromAtom(atom.extensions)
 
-                            rv_next.layoutManager = LinearLayoutManager(context)
-                            rv_next.adapter = ProgramAdapter(LiveSwitcherUtil
-                                    .getNextAtoms(atom.entries as ArrayList<APAtomEntry>),
-                                    context, this@LiveSwitcherFragment, false)
-                            ViewCompat.setNestedScrollingEnabled(rv_next, false)
+                            // recycler view with the live content
+                            setUpRecyclerView(rv_live, LiveSwitcherUtil
+                                    .getLiveAtoms(atom.entries as ArrayList<APAtomEntry>), channels, true)
+
+                            // recycler view with the content that goes next
+                            setUpRecyclerView(rv_next, LiveSwitcherUtil
+                                    .getNextAtoms(atom.entries as ArrayList<APAtomEntry>), channels, false)
                         }
                     }
 
@@ -64,6 +65,14 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                 })
             }
         }
+    }
+
+    fun setUpRecyclerView(recyclerView: RecyclerView, items: List<APAtomEntry>,
+                          channels: List<ChannelModel.Channel>,
+                          isLive: Boolean) {
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = ProgramAdapter(items, channels, context, this@LiveSwitcherFragment, isLive)
+        ViewCompat.setNestedScrollingEnabled(recyclerView, false)
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {

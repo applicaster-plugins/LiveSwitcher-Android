@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.R
+import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_program.view.*
 
-class ProgramAdapter(val items: List<APAtomEntry>, val context: Context?,
-                     val listener: OnProgramClickListener, val isLive: Boolean) : RecyclerView.Adapter<ProgramViewHolder>() {
+class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelModel.Channel>,
+                     val context: Context?, val listener: OnProgramClickListener,
+                     val isLive: Boolean) : RecyclerView.Adapter<ProgramViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramViewHolder {
         return ProgramViewHolder(LayoutInflater.from(context).inflate(R.layout.item_program, parent, false))
     }
@@ -29,6 +31,9 @@ class ProgramAdapter(val items: List<APAtomEntry>, val context: Context?,
         context?.let {
             Glide.with(context).asDrawable().load(items[position].mediaGroups[0].mediaItems[0].src)
                     .into(holder.ivImage)
+            Glide.with(context).asDrawable().load(LiveSwitcherUtil.getChannelIconUrl(channels,
+                    items[position].extensions?.get("applicaster_channel_id").toString()))
+                    .into(holder.ivChannel)
         }
 
         if (isLive) {
@@ -43,6 +48,8 @@ class ProgramAdapter(val items: List<APAtomEntry>, val context: Context?,
 
         // avoid recycling issues
         holder.tvIsWatching.visibility = View.GONE
+
+
     }
 
     interface OnProgramClickListener {
@@ -56,4 +63,5 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var ivAlert = view.iv_alert
     var tvTime = view.tv_time
     var tvIsWatching = view.tv_is_watching
+    var ivChannel = view.iv_channel
 }

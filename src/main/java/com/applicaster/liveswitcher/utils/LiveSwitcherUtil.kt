@@ -1,11 +1,13 @@
 package com.applicaster.liveswitcher.utils
 
 import com.applicaster.atom.model.APAtomEntry
+import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
+import com.google.gson.internal.LinkedTreeMap
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -95,6 +97,35 @@ class LiveSwitcherUtil {
 
             return String.format("%s - %s", startDateFormatter.format(startDate),
                     endDateFormatter.format(endDate))
+        }
+
+        fun getChannelsFromAtom(extensions: Map<String, Any>): List<ChannelModel.Channel> {
+            var channels = extensions["channels"]
+            var channelsFromAtom = ArrayList<ChannelModel.Channel>()
+            if (channels is ArrayList<*>) {
+                channels.forEach {
+                    if (it is LinkedTreeMap<*, *>) {
+                        channelsFromAtom.add(ChannelModel.Channel(
+                                it["name"].toString(),
+                                it["id"].toString(),
+                                it["logo"].toString(),
+                                it["free"].toString().toBoolean(),
+                                it["epg"].toString().toBoolean()))
+                    }
+                }
+            }
+
+            return channelsFromAtom
+        }
+
+        fun getChannelIconUrl(channels: List<ChannelModel.Channel>, applicasterId: String): String {
+            channels.forEach {
+                if(it.id == applicasterId) {
+                    return it.logo
+                }
+            }
+
+            return ""
         }
     }
 }
