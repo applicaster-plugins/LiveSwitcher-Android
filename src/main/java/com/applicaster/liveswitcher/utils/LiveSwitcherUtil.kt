@@ -33,7 +33,7 @@ class LiveSwitcherUtil {
         fun getLiveAtoms(entries: ArrayList<APAtomEntry>): List<APAtomEntry> {
             val liveAtoms = ArrayList<APAtomEntry>()
             entries.forEach {
-                if(getDateFormatted(it.extensions?.get("start_time").toString()) < getCurrentDate()
+                if (getDateFormatted(it.extensions?.get("start_time").toString()) < getCurrentDate()
                         && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
                     liveAtoms.add(it)
                 }
@@ -44,7 +44,7 @@ class LiveSwitcherUtil {
         fun getNextAtoms(entries: ArrayList<APAtomEntry>): List<APAtomEntry> {
             val nextAtoms = ArrayList<APAtomEntry>()
             entries.forEach {
-                if(getDateFormatted(it.extensions?.get("start_time").toString()) > getCurrentDate()
+                if (getDateFormatted(it.extensions?.get("start_time").toString()) > getCurrentDate()
                         && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
                     nextAtoms.add(it)
                 }
@@ -77,6 +77,24 @@ class LiveSwitcherUtil {
             destFormat.timeZone = tz
 
             return destFormat.format(parsed)
+        }
+
+        fun getTimeField(startTime: String, endTime: String): String {
+            val start = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val end = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            start.timeZone = TimeZone.getTimeZone("GMT-3")
+            end.timeZone = TimeZone.getTimeZone("GMT-3")
+
+            val startDate = start.parse(startTime)
+            val endDate = end.parse(endTime)
+
+            val startDateFormatter = SimpleDateFormat("dd MMMM, HH:mm", Locale.getDefault())
+            val endDateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+            startDateFormatter.timeZone = TimeZone.getDefault()
+            endDateFormatter.timeZone = TimeZone.getDefault()
+
+            return String.format("%s - %s", startDateFormatter.format(startDate),
+                    endDateFormatter.format(endDate))
         }
     }
 }
