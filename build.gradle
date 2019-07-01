@@ -63,6 +63,8 @@ dependencies {
     } else {
         api ("com.applicaster:applicaster-android-sdk:2.33.0")
     }
+
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
 }
 
 apply from: 'gradle/gradle-bintray-push.gradle'
