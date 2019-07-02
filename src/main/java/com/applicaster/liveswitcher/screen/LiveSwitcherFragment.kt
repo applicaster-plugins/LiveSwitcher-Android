@@ -3,6 +3,7 @@ package com.applicaster.liveswitcher.screen
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.CalendarContract
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -24,13 +25,16 @@ import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
+import com.applicaster.util.ui.Toaster
 import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
-class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
+class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickListener {
 
     var data: Any? = null
+    var entries: List<APAtomEntry>? = null
+    var channels: List<ChannelModel.Channel>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -46,16 +50,19 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
                     override fun onResult(atom: Any) {
                         Log.d(this.javaClass.simpleName, "onResult")
                         if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
+                            this@LiveSwitcherFragment.entries = atom.entries
                             // get channels
-                            val channels = LiveSwitcherUtil.getChannelsFromAtom(atom.extensions)
+                            this@LiveSwitcherFragment.channels = LiveSwitcherUtil.getChannelsFromAtom(atom.extensions)
 
                             // recycler view with the live content
                             setUpRecyclerView(rv_live, LiveSwitcherUtil
-                                    .getLiveAtoms(atom.entries as ArrayList<APAtomEntry>), channels, true)
+                                    .getLiveAtoms(this@LiveSwitcherFragment.entries),
+                                    this@LiveSwitcherFragment.channels, true)
 
                             // recycler view with the content that goes next
                             setUpRecyclerView(rv_next, LiveSwitcherUtil
-                                    .getNextAtoms(atom.entries as ArrayList<APAtomEntry>), channels, false)
+                                    .getNextAtoms(this@LiveSwitcherFragment.entries),
+                                    this@LiveSwitcherFragment.channels, false)
                         }
                     }
 
@@ -68,11 +75,24 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
     }
 
     fun setUpRecyclerView(recyclerView: RecyclerView, items: List<APAtomEntry>,
-                          channels: List<ChannelModel.Channel>,
+                          channels: List<ChannelModel.Channel>?,
                           isLive: Boolean) {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = ProgramAdapter(items, channels, context, this@LiveSwitcherFragment, isLive)
+        recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
         ViewCompat.setNestedScrollingEnabled(recyclerView, false)
+    }
+
+
+    override fun heartbeat() {
+        entries?.let {
+            // recycler view with the live content
+            setUpRecyclerView(rv_live, LiveSwitcherUtil.getLiveAtoms(entries),
+                    channels, true)
+
+            // recycler view with the content that goes next
+            setUpRecyclerView(rv_next, LiveSwitcherUtil.getNextAtoms(entries),
+                    channels, false)
+        }
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
@@ -87,5 +107,7 @@ class LiveSwitcherFragment : Fragment(), ProgramAdapter.OnProgramClickListener {
         }
     }
 
-
+    override fun onReminderClicked(atomEntry: APAtomEntry) {
+        Toaster.makeToast(context, "reminder was clicked")
+    }
 }

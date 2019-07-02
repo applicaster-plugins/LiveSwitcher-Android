@@ -9,10 +9,11 @@ import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.util.PreferenceUtil
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_program.view.*
 
-class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelModel.Channel>,
+class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelModel.Channel>?,
                      val context: Context?, val listener: OnProgramClickListener,
                      val isLive: Boolean) : RecyclerView.Adapter<ProgramViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramViewHolder {
@@ -41,19 +42,28 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
             holder.itemView.setOnClickListener {
                 listener.onProgramClicked(items[position])
                 holder.tvIsWatching.visibility = View.VISIBLE
+                PreferenceUtil.getInstance().setIntPref("item_selected_position", position)
             }
         } else {
             holder.ivAlert.visibility = View.VISIBLE
         }
 
-        // avoid recycling issues
-        holder.tvIsWatching.visibility = View.GONE
+        if(isLive && (PreferenceUtil.getInstance()
+                        .getIntPref("item_selected_position", -1) == position)) {
+            holder.tvIsWatching.visibility = View.VISIBLE
+        } else {
+            // avoid recycling issues
+            holder.tvIsWatching.visibility = View.GONE
+        }
 
-
+        holder.ivAlert.setOnClickListener {
+            listener.onReminderClicked(items[position])
+        }
     }
 
     interface OnProgramClickListener {
         fun onProgramClicked(atomEntry: APAtomEntry)
+        fun onReminderClicked(atomEntry: APAtomEntry)
     }
 }
 

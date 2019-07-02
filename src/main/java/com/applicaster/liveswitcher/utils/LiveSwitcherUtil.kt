@@ -32,9 +32,9 @@ class LiveSwitcherUtil {
             return programs
         }
 
-        fun getLiveAtoms(entries: ArrayList<APAtomEntry>): List<APAtomEntry> {
+        fun getLiveAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val liveAtoms = ArrayList<APAtomEntry>()
-            entries.forEach {
+            entries?.forEach {
                 if (getDateFormatted(it.extensions?.get("start_time").toString()) < getCurrentDate()
                         && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
                     liveAtoms.add(it)
@@ -43,9 +43,9 @@ class LiveSwitcherUtil {
             return liveAtoms
         }
 
-        fun getNextAtoms(entries: ArrayList<APAtomEntry>): List<APAtomEntry> {
+        fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val nextAtoms = ArrayList<APAtomEntry>()
-            entries.forEach {
+            entries?.forEach {
                 if (getDateFormatted(it.extensions?.get("start_time").toString()) > getCurrentDate()
                         && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
                     nextAtoms.add(it)
@@ -118,8 +118,8 @@ class LiveSwitcherUtil {
             return channelsFromAtom
         }
 
-        fun getChannelIconUrl(channels: List<ChannelModel.Channel>, applicasterId: String): String {
-            channels.forEach {
+        fun getChannelIconUrl(channels: List<ChannelModel.Channel>?, applicasterId: String): String {
+            channels?.forEach {
                 if(it.id == applicasterId) {
                     return it.logo
                 }
