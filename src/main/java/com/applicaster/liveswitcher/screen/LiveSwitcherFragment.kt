@@ -23,11 +23,13 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
+import com.applicaster.plugin_manager.playersmanager.PlayerContract
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.DateUtil
@@ -109,11 +111,22 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         iv_image.visibility = View.VISIBLE
         Glide.with(this@LiveSwitcherFragment)
                 .asDrawable().load(atomEntry.mediaGroups[0].mediaItems[0].src).into(iv_image)
+
         val playersManager = PlayersManager.getInstance()
-        val playerContract = playersManager.createPlayer(atomEntry.playable, context)
-        if (playerContract != null) {
-            playerContract.attachInline(rl_player)
-            playerContract.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
+        val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
+        var playerContract: PlayerContract? = null
+
+        channelId?.let {
+            val apChannel = APChannel()
+            apChannel.id = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()
+            playerContract = playersManager.createPlayer(apChannel, context)
+        } ?: run {
+            playerContract = playersManager.createPlayer(atomEntry.playable, context)
+        }
+
+        playerContract?.let {
+            it.attachInline(rl_player)
+            it.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
         }
     }
 

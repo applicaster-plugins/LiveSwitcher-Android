@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -22,8 +23,8 @@
         android:layout_width="30dp"
         android:layout_height="20dp"
         android:background="@color/white"
-        app:layout_constraintStart_toStartOf="@+id/iv_image"
-        app:layout_constraintTop_toTopOf="@+id/iv_image" />
+        app:layout_constraintBottom_toBottomOf="@+id/iv_image"
+        app:layout_constraintEnd_toEndOf="@+id/iv_image" />
 
     <TextView
         android:id="@+id/tv_is_watching"
@@ -36,8 +37,8 @@
         android:paddingBottom="4dp"
         android:text="VIENDO"
         android:textColor="@color/white"
-        android:visibility="gone"
         android:textSize="10sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/tv_program_name"
         app:layout_constraintStart_toStartOf="@+id/tv_program_name"
         app:layout_constraintTop_toTopOf="parent" />
