@@ -3,6 +3,7 @@ package com.applicaster.liveswitcher.utils
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
+import com.applicaster.liveswitcher.utils.Constants.SIMPLE_DATE_FORMAT
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import java.text.ParseException
+import java.time.format.DateTimeFormatter
 
 
 class LiveSwitcherUtil {
@@ -67,26 +69,26 @@ class LiveSwitcherUtil {
 
         fun getCurrentDate(): String {
             val date = Date()
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val dateFormat = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
             return dateFormat.format(date)
         }
 
         fun getDateFormatted(date: String): String {
-            val sourceFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            sourceFormat.timeZone = TimeZone.getTimeZone("GMT-5")
+            val sourceFormat = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
+            sourceFormat.timeZone = TimeZone.getTimeZone(getGmt(date))
             val parsed = sourceFormat.parse(date)
 
-            val destFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val destFormat = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
             destFormat.timeZone = TimeZone.getDefault()
 
             return destFormat.format(parsed)
         }
 
         fun getTimeField(startTime: String, endTime: String): String {
-            val start = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val end = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            start.timeZone = TimeZone.getTimeZone("GMT-5")
-            end.timeZone = TimeZone.getTimeZone("GMT-5")
+            val start = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
+            val end = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
+            start.timeZone = TimeZone.getTimeZone(getGmt(startTime))
+            end.timeZone = TimeZone.getTimeZone(getGmt(startTime))
 
             val startDate = start.parse(startTime)
             val endDate = end.parse(endTime)
@@ -130,12 +132,12 @@ class LiveSwitcherUtil {
         }
 
         fun getDateInMillis(startTime: String): Long {
-            val start = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            start.timeZone = TimeZone.getTimeZone("GMT-5")
+            val start = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
+            start.timeZone = TimeZone.getTimeZone(getGmt(startTime))
 
             val startDate = start.parse(startTime)
 
-            val startDateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val startDateFormatter = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
             startDateFormatter.timeZone = TimeZone.getDefault()
 
             val startDateString = startDateFormatter.format(startDate)
@@ -147,6 +149,11 @@ class LiveSwitcherUtil {
                 e.printStackTrace()
             }
             return 0
+        }
+
+        fun getGmt(time: String) : String {
+            var timeZone = time.substring(time.length - 5)
+            return String.format("GMT%s", timeZone)
         }
     }
 }
