@@ -11,6 +11,8 @@ import com.google.gson.internal.LinkedTreeMap
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import java.text.ParseException
+
 
 class LiveSwitcherUtil {
     companion object {
@@ -71,12 +73,11 @@ class LiveSwitcherUtil {
 
         fun getDateFormatted(date: String): String {
             val sourceFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            sourceFormat.timeZone = TimeZone.getTimeZone("GMT-3")
+            sourceFormat.timeZone = TimeZone.getTimeZone("GMT-5")
             val parsed = sourceFormat.parse(date)
 
-            val tz = TimeZone.getDefault()
             val destFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            destFormat.timeZone = tz
+            destFormat.timeZone = TimeZone.getDefault()
 
             return destFormat.format(parsed)
         }
@@ -84,8 +85,8 @@ class LiveSwitcherUtil {
         fun getTimeField(startTime: String, endTime: String): String {
             val start = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
             val end = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            start.timeZone = TimeZone.getTimeZone("GMT-3")
-            end.timeZone = TimeZone.getTimeZone("GMT-3")
+            start.timeZone = TimeZone.getTimeZone("GMT-5")
+            end.timeZone = TimeZone.getTimeZone("GMT-5")
 
             val startDate = start.parse(startTime)
             val endDate = end.parse(endTime)
@@ -126,6 +127,26 @@ class LiveSwitcherUtil {
             }
 
             return ""
+        }
+
+        fun getDateInMillis(startTime: String): Long {
+            val start = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            start.timeZone = TimeZone.getTimeZone("GMT-5")
+
+            val startDate = start.parse(startTime)
+
+            val startDateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            startDateFormatter.timeZone = TimeZone.getDefault()
+
+            val startDateString = startDateFormatter.format(startDate)
+            val starDateDate = startDateFormatter.parse(startDateString)
+
+            try {
+                return starDateDate.time // return time in milliseconds
+            } catch (e: ParseException) {
+                e.printStackTrace()
+            }
+            return 0
         }
     }
 }

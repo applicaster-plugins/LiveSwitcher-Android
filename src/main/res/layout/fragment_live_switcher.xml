@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        android:background="@color/faded_black"
+        android:background="@color/feed_grey"
         app:layout_constraintTop_toBottomOf="@+id/rl_player">
 
         <android.support.constraint.ConstraintLayout

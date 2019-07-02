@@ -19,12 +19,20 @@ import com.applicaster.jspipes.JSManager
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.model.APProgram
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
+import com.applicaster.util.AlarmManagerUtil
+import com.applicaster.util.DateUtil
+import com.applicaster.util.serialization.SerializationUtils
+import com.applicaster.util.ui.ImageHolderBuilder
 import com.applicaster.util.ui.Toaster
 import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
@@ -74,12 +82,14 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         }
     }
 
-    fun setUpRecyclerView(recyclerView: RecyclerView, items: List<APAtomEntry>,
+    fun setUpRecyclerView(recyclerView: RecyclerView?, items: List<APAtomEntry>,
                           channels: List<ChannelModel.Channel>?,
                           isLive: Boolean) {
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
-        ViewCompat.setNestedScrollingEnabled(recyclerView, false)
+        recyclerView?.let {
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
+            ViewCompat.setNestedScrollingEnabled(recyclerView, false)
+        }
     }
 
 
@@ -108,6 +118,19 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     override fun onReminderClicked(atomEntry: APAtomEntry) {
-        Toaster.makeToast(context, "reminder was clicked")
+        val program = APProgram()
+        program.id = atomEntry.id
+        program.channel_id = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()
+        program.starts_at = atomEntry.extensions?.get(EXTENSION_START_TIME).toString()
+        program.ends_at = atomEntry.extensions?.get(EXTENSION_END_TIME).toString()
+        program.name = atomEntry.title
+        program.is_live = atomEntry.playable.isLive.toString()
+
+        val programImageHolder = ImageHolderBuilder.getProgramItemImageHolder(program, ImageHolderBuilder.ReminderHandlerType.NONE)
+        val programAsJson = SerializationUtils.toJson(programImageHolder)
+
+        context?.let {
+            AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, LiveSwitcherUtil.getDateInMillis(program.starts_at))
+        }
     }
 }

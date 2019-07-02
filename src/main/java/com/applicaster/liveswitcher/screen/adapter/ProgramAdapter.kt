@@ -43,6 +43,7 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
                 listener.onProgramClicked(items[position])
                 holder.tvIsWatching.visibility = View.VISIBLE
                 PreferenceUtil.getInstance().setIntPref("item_selected_position", position)
+                notifyDataSetChanged()
             }
         } else {
             holder.ivAlert.visibility = View.VISIBLE

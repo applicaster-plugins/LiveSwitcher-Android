@@ -21,6 +21,7 @@
         android:id="@+id/iv_channel"
         android:layout_width="30dp"
         android:layout_height="20dp"
+        android:background="@color/white"
         app:layout_constraintStart_toStartOf="@+id/iv_image"
         app:layout_constraintTop_toTopOf="@+id/iv_image" />
 
@@ -65,11 +66,11 @@
 
     <ImageView
         android:id="@+id/iv_alert"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginEnd="16dp"
         android:layout_weight="1"
-        android:src="@drawable/remainder_on"
+        android:src="@drawable/alert"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
