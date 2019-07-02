@@ -8,7 +8,11 @@ import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.PreferenceUtil
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_program.view.*
@@ -27,13 +31,20 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
     override fun onBindViewHolder(holder: ProgramViewHolder, position: Int) {
         holder.tvProgramName.text = items[position].title
         holder.tvTime.text = LiveSwitcherUtil.getTimeField(
-                items[position].extensions?.get("start_time").toString(),
-                items[position].extensions?.get("end_time").toString())
+                items[position].extensions?.get(EXTENSION_START_TIME).toString(),
+                items[position].extensions?.get(EXTENSION_END_TIME).toString())
+
         context?.let {
+            if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+                holder.ivAlert.setImageResource(R.drawable.alert_set)
+            } else {
+                holder.ivAlert.setImageResource(R.drawable.alert)
+            }
+
             Glide.with(context).asDrawable().load(items[position].mediaGroups[0].mediaItems[0].src)
                     .into(holder.ivImage)
             Glide.with(context).asDrawable().load(LiveSwitcherUtil.getChannelIconUrl(channels,
-                    items[position].extensions?.get("applicaster_channel_id").toString()))
+                    items[position].extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()))
                     .into(holder.ivChannel)
         }
 
@@ -49,7 +60,7 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
             holder.ivAlert.visibility = View.VISIBLE
         }
 
-        if(isLive && (PreferenceUtil.getInstance()
+        if (isLive && (PreferenceUtil.getInstance()
                         .getIntPref("item_selected_position", -1) == position)) {
             holder.tvIsWatching.visibility = View.VISIBLE
         } else {
@@ -58,13 +69,22 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
         }
 
         holder.ivAlert.setOnClickListener {
-            listener.onReminderClicked(items[position])
+            context?.let {
+                if (AlarmManagerUtil.isAlarmSet(it, items[position].id)) {
+                    listener.removeReminder(items[position])
+                    holder.ivAlert.setImageResource(R.drawable.alert)
+                } else {
+                    listener.addReminder(items[position])
+                    holder.ivAlert.setImageResource(R.drawable.alert_set)
+                }
+            }
         }
     }
 
     interface OnProgramClickListener {
         fun onProgramClicked(atomEntry: APAtomEntry)
-        fun onReminderClicked(atomEntry: APAtomEntry)
+        fun addReminder(atomEntry: APAtomEntry)
+        fun removeReminder(atomEntry: APAtomEntry)
     }
 }
 

@@ -117,7 +117,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         }
     }
 
-    override fun onReminderClicked(atomEntry: APAtomEntry) {
+    override fun addReminder(atomEntry: APAtomEntry) {
         val program = APProgram()
         program.id = atomEntry.id
         program.channel_id = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()
@@ -131,6 +131,12 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
 
         context?.let {
             AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, LiveSwitcherUtil.getDateInMillis(program.starts_at))
+        }
+    }
+
+    override fun removeReminder(atomEntry: APAtomEntry) {
+        context?.let {
+            AlarmManagerUtil.removeIfExistsInReminder(it, atomEntry.id)
         }
     }
 }
