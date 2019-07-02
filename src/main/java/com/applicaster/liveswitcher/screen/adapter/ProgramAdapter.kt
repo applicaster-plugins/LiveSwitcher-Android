@@ -11,17 +11,20 @@ import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
+import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.PreferenceUtil
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_program.view.*
 
-class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelModel.Channel>?,
-                     val context: Context?, val listener: OnProgramClickListener,
-                     val isLive: Boolean) : RecyclerView.Adapter<ProgramViewHolder>() {
+class ProgramAdapter(private val items: List<APAtomEntry>, private val channels: List<ChannelModel.Channel>?,
+                     private val context: Context?, private val listener: OnProgramClickListener,
+                     private val isLive: Boolean) : RecyclerView.Adapter<ProgramViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramViewHolder {
-        return ProgramViewHolder(LayoutInflater.from(context).inflate(R.layout.item_program, parent, false))
+        return ProgramViewHolder(LayoutInflater.from(context).inflate(R.layout.item_program,
+                parent, false))
     }
 
     override fun getItemCount(): Int {
@@ -30,30 +33,36 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
 
     override fun onBindViewHolder(holder: ProgramViewHolder, position: Int) {
         holder.tvProgramName.text = items[position].title
+        // get formatted date-time
         holder.tvTime.text = LiveSwitcherUtil.getTimeField(
                 items[position].extensions?.get(EXTENSION_START_TIME).toString(),
                 items[position].extensions?.get(EXTENSION_END_TIME).toString())
 
         context?.let {
+            // set alarm icon depending on if the reminder is set or not
             if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
                 holder.ivAlert.setImageResource(R.drawable.alert_set)
             } else {
                 holder.ivAlert.setImageResource(R.drawable.alert)
             }
 
+            // load image of the program
             Glide.with(context).asDrawable().load(items[position].mediaGroups[0].mediaItems[0].src)
                     .into(holder.ivImage)
+
+            // load logo of the channel
             Glide.with(context).asDrawable().load(LiveSwitcherUtil.getChannelIconUrl(channels,
                     items[position].extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()))
                     .into(holder.ivChannel)
         }
 
+        // if it's live, don't show the alert icon
         if (isLive) {
             holder.ivAlert.visibility = View.GONE
             holder.itemView.setOnClickListener {
                 listener.onProgramClicked(items[position])
                 holder.tvIsWatching.visibility = View.VISIBLE
-                PreferenceUtil.getInstance().setIntPref("item_selected_position", position)
+                PreferenceUtil.getInstance().setIntPref(PREFERENCE_ITEM_SELECTED_POSITION, position)
                 notifyDataSetChanged()
             }
         } else {
@@ -61,7 +70,7 @@ class ProgramAdapter(val items: List<APAtomEntry>, val channels: List<ChannelMod
         }
 
         if (isLive && (PreferenceUtil.getInstance()
-                        .getIntPref("item_selected_position", -1) == position)) {
+                        .getIntPref(PREFERENCE_ITEM_SELECTED_POSITION, -1) == position)) {
             holder.tvIsWatching.visibility = View.VISIBLE
         } else {
             // avoid recycling issues

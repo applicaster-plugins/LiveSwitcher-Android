@@ -22,6 +22,7 @@ import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
+import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
@@ -33,6 +34,7 @@ import com.applicaster.plugin_manager.playersmanager.PlayerContract
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.DateUtil
+import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
 import com.applicaster.util.ui.Toaster
@@ -45,6 +47,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     var data: Any? = null
     var entries: List<APAtomEntry>? = null
     var channels: List<ChannelModel.Channel>? = null
+    var playerContract: PlayerContract? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -65,9 +68,11 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                             this@LiveSwitcherFragment.channels = LiveSwitcherUtil.getChannelsFromAtom(atom.extensions)
 
                             // recycler view with the live content
-                            setUpRecyclerView(rv_live, LiveSwitcherUtil
-                                    .getLiveAtoms(this@LiveSwitcherFragment.entries),
+                            val liveItems = LiveSwitcherUtil
+                                    .getLiveAtoms(this@LiveSwitcherFragment.entries)
+                            setUpRecyclerView(rv_live, liveItems,
                                     this@LiveSwitcherFragment.channels, true)
+                            playFirstItem(liveItems)
 
                             // recycler view with the content that goes next
                             setUpRecyclerView(rv_next, LiveSwitcherUtil
@@ -81,6 +86,15 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                     }
                 })
             }
+        }
+    }
+
+    private fun playFirstItem(liveItems: List<APAtomEntry>) {
+        var position = PreferenceUtil.getInstance().getIntPref(PREFERENCE_ITEM_SELECTED_POSITION,
+                0)
+
+        if (position < liveItems.size) {
+            onProgramClicked(liveItems[position])
         }
     }
 
@@ -114,7 +128,8 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
 
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
-        var playerContract: PlayerContract? = null
+
+        playerContract?.removeInline(rl_player)
 
         channelId?.let {
             val apChannel = APChannel()
