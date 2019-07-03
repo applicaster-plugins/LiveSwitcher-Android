@@ -8,6 +8,7 @@ import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
+import com.applicaster.util.PreferenceUtil
 import com.google.gson.internal.LinkedTreeMap
 import java.text.SimpleDateFormat
 import java.util.*
@@ -154,6 +155,14 @@ class LiveSwitcherUtil {
         fun getGmt(time: String) : String {
             var timeZone = time.substring(time.length - 5)
             return String.format("GMT%s", timeZone)
+        }
+
+        fun getConfigurationString(key: String) : String {
+            return PreferenceUtil.getInstance().getStringPref(key, "")
+        }
+
+        fun setConfigurationString(key: String, value: String) {
+            PreferenceUtil.getInstance().setStringPref(key, value)
         }
     }
 }

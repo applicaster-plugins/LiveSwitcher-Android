@@ -36,5 +36,198 @@
       "type": "text_input"
     }
      ]
+  },
+  "general": {
+    "fields": [
+      {
+        "key": "ls_live_header_text",
+        "label": "Header text for live section",
+        "placeholder": "Live header text",
+        "label_tooltip": "Header text for live section",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_live_header_text_color",
+        "label": "Text color for the live header",
+        "placeholder": "Live header text color",
+        "label_tooltip": "Text color for the live header",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_live_header_fontsize",
+        "label": "Font size of the live header text",
+        "placeholder": "Live header font size",
+        "label_tooltip": "Font size of the header text",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_live_header_height",
+        "label": "Height of the live header",
+        "placeholder": "Live header height",
+        "label_tooltip": "Height of the header",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_live_header_background_color",
+        "label": "Background of the live header",
+        "placeholder": "Live header background color",
+        "label_tooltip": "Background of the live header",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_next_header_text",
+        "label": "Header text for next section",
+        "placeholder": "Next header text",
+        "label_tooltip": "Header text for next section",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_next_header_text_color",
+        "label": "Text color for the next header",
+        "placeholder": "Next header text color",
+        "label_tooltip": "Text color for the next header",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_next_header_fontsize",
+        "label": "Font size of the header text",
+        "placeholder": "Header font size",
+        "label_tooltip": "Font size of the header text",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_next_header_height",
+        "label": "Height of the header",
+        "placeholder": "Header height",
+        "label_tooltip": "Height of the header",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_next_header_background_color",
+        "label": "Background of the header",
+        "placeholder": "Next background color",
+        "label_tooltip": "Background of the header",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_program_title_text_color",
+        "label": "Text color for the title of the program",
+        "placeholder": "Program title text color",
+        "label_tooltip": "Text color for the title of the program",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_program_title_fontsize",
+        "label": "Font size of the title of the program",
+        "placeholder": "Program title font size",
+        "label_tooltip": "Font size of the title of the program",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_program_schedule_text_color",
+        "label": "Text color for the schedule of the program",
+        "placeholder": "Schedule text color",
+        "label_tooltip": "Text color for the schedule of the program",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_program_schedule_fontsize",
+        "label": "Font size of the schedule of the program",
+        "placeholder": "Program schedule font size",
+        "label_tooltip": "Font size of the schedule of the program",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_watching_tag_text",
+        "label": "Text for the watching tag",
+        "placeholder": "Watching tag text",
+        "label_tooltip": "Text for watching tag",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_watching_tag_text_color",
+        "label": "Text color for the watching tag",
+        "placeholder": "Watching tag text color",
+        "label_tooltip": "Text color for the watching tag",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_watching_tag_fontsize",
+        "label": "Font size of the watching tag text",
+        "placeholder": "Watching tag font size",
+        "label_tooltip": "Font size of the watching tag",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_watching_tag_text_background_color",
+        "label": "Watching tag text background color",
+        "placeholder": "Watching tag text background color",
+        "label_tooltip": "Watching tag text background color",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_live_event_tag_text",
+        "label": "Live event tag text",
+        "placeholder": "Live event tag text",
+        "label_tooltip": "Live event tag text",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_live_event_tag_text_color",
+        "label": "Live event tag text color",
+        "placeholder": "Live event tag text color",
+        "label_tooltip": "Live event tag text color",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_live_event_tag_fontsize",
+        "label": "Live event tag text font size",
+        "placeholder": "Live event tag text font size",
+        "label_tooltip": "Live event tag text font size",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_live_event_tag_text_background_color",
+        "label": "Live event tag text background color",
+        "placeholder": "Live event tag text background color",
+        "label_tooltip": "Live event tag text background color",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_channel_icon_height",
+        "label": "Channel icon height",
+        "placeholder": "Channel icon height",
+        "label_tooltip": "Channel icon height",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_channel_icon_width",
+        "label": "Channel icon width",
+        "placeholder": "Channel icon width",
+        "label_tooltip": "Channel icon width",
+        "type": "text_input"
+      },
+      {
+        "key": "ls_background_color",
+        "label": "Background color of the list",
+        "placeholder": "Background color of the list",
+        "label_tooltip": "Background color of the list",
+        "type": "color_picker"
+      },
+      {
+        "key": "ls_reminder_asset_selected",
+        "label": "Reminder image when active",
+        "placeholder": "Reminder image when active",
+        "label_tooltip": "Reminder image when active",
+        "type": "uploader"
+      },
+      {
+        "key": "ls_reminder_asset",
+        "label": "Reminder image when unactive",
+        "placeholder": "Reminder image when unactive",
+        "label_tooltip": "Reminder image when unactive",
+        "type": "uploader"
+      }
+    ]
   }
 }

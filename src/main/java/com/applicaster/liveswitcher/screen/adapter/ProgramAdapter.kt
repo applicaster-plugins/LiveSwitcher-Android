@@ -1,13 +1,17 @@
 package com.applicaster.liveswitcher.screen.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
+import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
+import com.applicaster.liveswitcher.utils.Constants
+import com.applicaster.liveswitcher.utils.Constants.CONF_REMINDER_ASSET
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
@@ -39,11 +43,10 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
                 items[position].extensions?.get(EXTENSION_END_TIME).toString())
 
         context?.let {
+            val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) { holder.reminderAssetActive } else { holder.reminderAssetInactive }
             // set alarm icon depending on if the reminder is set or not
-            if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
-                holder.ivAlert.setImageResource(R.drawable.alert_set)
-            } else {
-                holder.ivAlert.setImageResource(R.drawable.alert)
+            assetUrl?.let {
+                Glide.with(context).asDrawable().load(assetUrl).into(holder.ivAlert)
             }
 
             // load image of the program
@@ -81,10 +84,10 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
             context?.let {
                 if (AlarmManagerUtil.isAlarmSet(it, items[position].id)) {
                     listener.removeReminder(items[position])
-                    holder.ivAlert.setImageResource(R.drawable.alert)
+                    Glide.with(context).asDrawable().load(holder.reminderAssetInactive).into(holder.ivAlert)
                 } else {
                     listener.addReminder(items[position])
-                    holder.ivAlert.setImageResource(R.drawable.alert_set)
+                    Glide.with(context).asDrawable().load(holder.reminderAssetActive).into(holder.ivAlert)
                 }
             }
         }
@@ -104,4 +107,22 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvTime = view.tv_time
     var tvIsWatching = view.tv_is_watching
     var ivChannel = view.iv_channel
+    var reminderAssetActive: String? = null
+    var reminderAssetInactive: String? = null
+
+    init {
+        tvProgramName.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_TEXT_COLOR).toString()))
+        tvProgramName.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_FONTSIZE).toString().toFloat()
+
+        tvTime.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_TEXT_COLOR).toString()))
+        tvTime.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_FONTSIZE).toString().toFloat()
+
+        tvIsWatching.text = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT).toString()
+        tvIsWatching.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_COLOR).toString()))
+        tvIsWatching.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString().toFloat()
+        tvIsWatching.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_BACKGROUND_COLOR).toString()))
+
+        reminderAssetActive = LiveSwitcherContract.configuration?.get(Constants.CONF_REMINDER_ASSET_SELECTED).toString()
+        reminderAssetInactive = LiveSwitcherContract.configuration?.get(CONF_REMINDER_ASSET).toString()
+    }
 }

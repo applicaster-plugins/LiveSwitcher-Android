@@ -1,10 +1,9 @@
 package com.applicaster.liveswitcher.screen
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.CalendarContract
-import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -16,9 +15,19 @@ import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
+import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
+import com.applicaster.liveswitcher.utils.Constants.CONF_BACKGROUND_COLOR
+import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_BACKGROUND_COLOR
+import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_FONTSIZE
+import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_TEXT
+import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_TEXT_COLOR
+import com.applicaster.liveswitcher.utils.Constants.CONF_NEXT_HEADER_BACKGROUND_COLOR
+import com.applicaster.liveswitcher.utils.Constants.CONF_NEXT_HEADER_FONTSIZE
+import com.applicaster.liveswitcher.utils.Constants.CONF_NEXT_HEADER_TEXT
+import com.applicaster.liveswitcher.utils.Constants.CONF_NEXT_HEADER_TEXT_COLOR
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
@@ -26,19 +35,12 @@ import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POS
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
-import com.applicaster.player.VideoAdsUtil
-import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
-import com.applicaster.plugin_manager.playersmanager.Playable
-import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.applicaster.util.AlarmManagerUtil
-import com.applicaster.util.DateUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
-import com.applicaster.util.ui.Toaster
-import com.bumptech.glide.Glide
 import com.google.gson.internal.LinkedTreeMap
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
@@ -56,6 +58,10 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // set up view
+        setUpView()
+
+        // data has value when creating the fragment
         if (data is LinkedTreeMap<*, *>) {
             val source = (data as LinkedTreeMap<*, *>)["source"].toString()
             Handler(Looper.getMainLooper()).post {
@@ -89,6 +95,20 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                 })
             }
         }
+    }
+
+    private fun setUpView() {
+        nsv_lists.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(CONF_BACKGROUND_COLOR).toString()))
+
+        tv_header_live.text = LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_TEXT).toString()
+        tv_header_live.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_TEXT_COLOR).toString()))
+        tv_header_live.textSize = LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_FONTSIZE).toString().toFloat()
+        tv_header_live.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_BACKGROUND_COLOR).toString()))
+
+        tv_header_next.text = LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_TEXT).toString()
+        tv_header_next.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_TEXT_COLOR).toString()))
+        tv_header_next.textSize = LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_FONTSIZE).toString().toFloat()
+        tv_header_next.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_BACKGROUND_COLOR).toString()))
     }
 
     private fun playFirstItem(liveItems: List<APAtomEntry>) {
