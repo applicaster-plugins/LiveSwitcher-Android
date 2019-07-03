@@ -14,6 +14,7 @@ import com.applicaster.liveswitcher.utils.Constants
 import com.applicaster.liveswitcher.utils.Constants.CONF_REMINDER_ASSET
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_IS_LIVE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
@@ -42,8 +43,18 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
                 items[position].extensions?.get(EXTENSION_START_TIME).toString(),
                 items[position].extensions?.get(EXTENSION_END_TIME).toString())
 
+        if (items[position].extensions?.get(EXTENSION_IS_LIVE).toString().toBoolean()) {
+            holder.tvLiveEvent.visibility = View.VISIBLE
+        } else {
+            holder.tvLiveEvent.visibility = View.GONE
+        }
+
         context?.let {
-            val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) { holder.reminderAssetActive } else { holder.reminderAssetInactive }
+            val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+                holder.reminderAssetActive
+            } else {
+                holder.reminderAssetInactive
+            }
             // set alarm icon depending on if the reminder is set or not
             assetUrl?.let {
                 Glide.with(context).asDrawable().load(assetUrl).into(holder.ivAlert)
@@ -107,6 +118,7 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvTime = view.tv_time
     var tvIsWatching = view.tv_is_watching
     var ivChannel = view.iv_channel
+    var tvLiveEvent = view.tv_live_event
     var reminderAssetActive: String? = null
     var reminderAssetInactive: String? = null
 
@@ -121,6 +133,11 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvIsWatching.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_COLOR).toString()))
         tvIsWatching.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString().toFloat()
         tvIsWatching.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_BACKGROUND_COLOR).toString()))
+
+        tvLiveEvent.text = LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT).toString()
+        tvLiveEvent.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_COLOR).toString()))
+        tvLiveEvent.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString().toFloat()
+        tvLiveEvent.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_BACKGROUND_COLOR).toString()))
 
         reminderAssetActive = LiveSwitcherContract.configuration?.get(Constants.CONF_REMINDER_ASSET_SELECTED).toString()
         reminderAssetInactive = LiveSwitcherContract.configuration?.get(CONF_REMINDER_ASSET).toString()

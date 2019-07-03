@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:clickable="true"
     android:focusable="true"
@@ -36,12 +37,30 @@
         android:paddingTop="4dp"
         android:paddingEnd="4dp"
         android:paddingBottom="4dp"
-        android:text="-"
+        android:text="SOMETHING"
         android:textColor="@color/white"
         android:textSize="10sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/tv_program_name"
         app:layout_constraintStart_toStartOf="@+id/tv_program_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_live_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/blue"
+        android:paddingStart="4dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="4dp"
+        android:text="LIVE EVENT"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/tv_is_watching"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
