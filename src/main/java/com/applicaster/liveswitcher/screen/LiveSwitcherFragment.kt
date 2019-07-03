@@ -70,11 +70,13 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                             // recycler view with the live content
                             val liveItems = LiveSwitcherUtil
                                     .getLiveAtoms(this@LiveSwitcherFragment.entries)
+                            tv_header_live.visibility = View.VISIBLE
                             setUpRecyclerView(rv_live, liveItems,
                                     this@LiveSwitcherFragment.channels, true)
                             playFirstItem(liveItems)
 
                             // recycler view with the content that goes next
+                            tv_header_next.visibility = View.VISIBLE
                             setUpRecyclerView(rv_next, LiveSwitcherUtil
                                     .getNextAtoms(this@LiveSwitcherFragment.entries),
                                     this@LiveSwitcherFragment.channels, false)
@@ -102,6 +104,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                           channels: List<ChannelModel.Channel>?,
                           isLive: Boolean) {
         recyclerView?.let {
+            recyclerView.visibility = View.VISIBLE
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
             ViewCompat.setNestedScrollingEnabled(recyclerView, false)
@@ -122,9 +125,6 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
-        iv_image.visibility = View.VISIBLE
-        Glide.with(this@LiveSwitcherFragment)
-                .asDrawable().load(atomEntry.mediaGroups[0].mediaItems[0].src).into(iv_image)
 
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
