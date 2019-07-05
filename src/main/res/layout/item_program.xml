@@ -40,7 +40,7 @@
         android:text="SOMETHING"
         android:textColor="@color/white"
         android:textSize="10sp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/tv_program_name"
         app:layout_constraintStart_toStartOf="@+id/tv_program_name"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
         android:background="@color/blue"
         android:paddingStart="4dp"
         android:paddingTop="4dp"
@@ -59,7 +58,8 @@
         android:text="LIVE EVENT"
         android:textColor="@color/white"
         android:textSize="10sp"
-        android:visibility="visible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/tv_program_name"
         app:layout_constraintStart_toEndOf="@+id/tv_is_watching"
         app:layout_constraintTop_toTopOf="parent" />
 
