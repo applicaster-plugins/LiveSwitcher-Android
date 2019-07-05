@@ -98,17 +98,23 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     private fun setUpView() {
-        nsv_lists.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(CONF_BACKGROUND_COLOR).toString()))
+        nsv_lists.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
 
-        tv_header_live.text = LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_TEXT).toString()
-        tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_TEXT_COLOR).toString()))
-        tv_header_live.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_FONTSIZE).toString())
-        tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(CONF_LIVE_HEADER_BACKGROUND_COLOR).toString()))
+        tv_header_live.text = LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT)
+        tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(
+                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
+        tv_header_live.textSize = LiveSwitcherUtil.getFloat(
+                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_FONTSIZE))
+        tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
 
-        tv_header_next.text = LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_TEXT).toString()
-        tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_TEXT_COLOR).toString()))
-        tv_header_next.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_FONTSIZE).toString())
-        tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(CONF_NEXT_HEADER_BACKGROUND_COLOR).toString()))
+        tv_header_next.text = LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT)
+        tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(
+                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
+        tv_header_next.textSize = LiveSwitcherUtil.getFloat(
+                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_FONTSIZE))
+        tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
     }
 
     private fun playFirstItem(liveItems: List<APAtomEntry>) {
