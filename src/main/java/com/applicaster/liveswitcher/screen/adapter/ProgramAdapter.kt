@@ -43,11 +43,12 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
                 items[position].extensions?.get(EXTENSION_START_TIME).toString(),
                 items[position].extensions?.get(EXTENSION_END_TIME).toString())
 
-        if (items[position].extensions?.get(EXTENSION_IS_LIVE).toString().toBoolean()) {
-            holder.tvLiveEvent.visibility = View.VISIBLE
-        } else {
-            holder.tvLiveEvent.visibility = View.GONE
-        }
+        // implementation pending for live tag
+//        if (items[position].extensions?.get(EXTENSION_IS_LIVE).toString().toBoolean()) {
+//            holder.tvLiveEvent.visibility = View.VISIBLE
+//        } else {
+//            holder.tvLiveEvent.visibility = View.GONE
+//        }
 
         context?.let {
             val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
@@ -84,7 +85,7 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
         }
 
         if (isLive && (PreferenceUtil.getInstance()
-                        .getIntPref(PREFERENCE_ITEM_SELECTED_POSITION, -1) == position)) {
+                        .getIntPref(PREFERENCE_ITEM_SELECTED_POSITION, 0) == position)) {
             holder.tvIsWatching.visibility = View.VISIBLE
         } else {
             // avoid recycling issues
