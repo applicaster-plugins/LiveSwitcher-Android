@@ -124,21 +124,21 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var reminderAssetInactive: String? = null
 
     init {
-        tvProgramName.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_TEXT_COLOR).toString()))
-        tvProgramName.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_FONTSIZE).toString().toFloat()
+        tvProgramName.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_TEXT_COLOR).toString()))
+        tvProgramName.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_TITLE_FONTSIZE).toString())
 
-        tvTime.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_TEXT_COLOR).toString()))
-        tvTime.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_FONTSIZE).toString().toFloat()
+        tvTime.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_TEXT_COLOR).toString()))
+        tvTime.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(Constants.CONF_PROGRAM_SCHEDULE_FONTSIZE).toString())
 
         tvIsWatching.text = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT).toString()
-        tvIsWatching.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_COLOR).toString()))
-        tvIsWatching.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString().toFloat()
-        tvIsWatching.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_BACKGROUND_COLOR).toString()))
+        tvIsWatching.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_COLOR).toString()))
+        tvIsWatching.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString())
+        tvIsWatching.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_BACKGROUND_COLOR).toString()))
 
         tvLiveEvent.text = LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT).toString()
-        tvLiveEvent.setTextColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_COLOR).toString()))
-        tvLiveEvent.textSize = LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString().toFloat()
-        tvLiveEvent.setBackgroundColor(Color.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_BACKGROUND_COLOR).toString()))
+        tvLiveEvent.setTextColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_COLOR).toString()))
+        tvLiveEvent.textSize = LiveSwitcherUtil.getFloat(LiveSwitcherContract.configuration?.get(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE).toString())
+        tvLiveEvent.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherContract.configuration?.get(Constants.CONF_LIVE_EVENT_TAG_TEXT_BACKGROUND_COLOR).toString()))
 
         reminderAssetActive = LiveSwitcherContract.configuration?.get(Constants.CONF_REMINDER_ASSET_SELECTED).toString()
         reminderAssetInactive = LiveSwitcherContract.configuration?.get(CONF_REMINDER_ASSET).toString()
