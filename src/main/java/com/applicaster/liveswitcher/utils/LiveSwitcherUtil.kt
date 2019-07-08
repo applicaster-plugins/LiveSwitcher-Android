@@ -1,10 +1,14 @@
 package com.applicaster.liveswitcher.utils
 
+import android.graphics.Color
 import com.applicaster.atom.model.APAtomEntry
+import com.applicaster.liveswitcher.LiveSwitcherContract
+import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
 import com.applicaster.liveswitcher.utils.Constants.SIMPLE_DATE_FORMAT
 import com.applicaster.player.VideoAdsUtil
+import com.applicaster.plugin_manager.login.LoginContract
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
@@ -124,7 +128,7 @@ class LiveSwitcherUtil {
 
         fun getChannelIconUrl(channels: List<ChannelModel.Channel>?, applicasterId: String): String {
             channels?.forEach {
-                if(it.id == applicasterId) {
+                if (it.id == applicasterId) {
                     return it.logo
                 }
             }
@@ -152,17 +156,29 @@ class LiveSwitcherUtil {
             return 0
         }
 
-        fun getGmt(time: String) : String {
+        fun getGmt(time: String): String {
             var timeZone = time.substring(time.length - 5)
             return String.format("GMT%s", timeZone)
         }
 
-        fun getConfigurationString(key: String) : String {
-            return PreferenceUtil.getInstance().getStringPref(key, "")
+        fun parseColor(color: String): Int {
+            return if (color.isNotEmpty() && color != "null") {
+                Color.parseColor(color)
+            } else {
+                Color.parseColor("#000000")
+            }
         }
 
-        fun setConfigurationString(key: String, value: String) {
-            PreferenceUtil.getInstance().setStringPref(key, value)
+        fun getFloat(number: String): Float {
+            return if (number.isNotEmpty() && number != "null") {
+                number.toFloat()
+            } else {
+                "14".toFloat()
+            }
+        }
+
+        fun getParam(key: String) : String {
+            return LiveSwitcherContract.configuration?.get(key).toString()
         }
     }
 }
