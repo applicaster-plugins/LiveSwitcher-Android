@@ -8,22 +8,28 @@
     android:clickable="true"
     android:focusable="true">
 
-    <ImageView
-        android:id="@+id/iv_image"
-        android:layout_width="200dp"
-        android:layout_height="128dp"
+    <com.applicaster.util.ui.APRoundedCornerRelativeLayout
+        android:id="@+id/rl_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/iv_channel"
-        android:layout_width="30dp"
-        android:layout_height="20dp"
-        android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_image"
-        app:layout_constraintEnd_toEndOf="@+id/iv_image" />
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="200dp"
+            android:layout_height="128dp"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/iv_channel"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:layout_alignEnd="@id/iv_image"
+            android:layout_alignBottom="@id/iv_image"
+            android:background="@color/white" />
+    </com.applicaster.util.ui.APRoundedCornerRelativeLayout>
 
     <TextView
         android:id="@+id/tv_is_watching"
@@ -41,7 +47,7 @@
         android:textSize="10sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_image" />
+        app:layout_constraintTop_toBottomOf="@+id/rl_image" />
 
     <TextView
         android:id="@+id/tv_live_event"
@@ -57,8 +63,8 @@
         android:textSize="10sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/iv_image"
-        app:layout_constraintTop_toTopOf="@+id/iv_image" />
+        app:layout_constraintStart_toStartOf="@+id/rl_image"
+        app:layout_constraintTop_toTopOf="@+id/rl_image" />
 
     <TextView
         android:id="@+id/tv_program_name"
@@ -69,7 +75,7 @@
         android:text="-"
         android:textColor="@color/black"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@+id/iv_image"
+        app:layout_constraintStart_toStartOf="@+id/rl_image"
         app:layout_constraintTop_toBottomOf="@+id/tv_time" />
 
     <TextView
@@ -79,8 +85,8 @@
         android:layout_marginTop="8dp"
         android:text="-"
         android:textColor="@color/faded_black"
-        app:layout_constraintStart_toStartOf="@+id/iv_image"
-        app:layout_constraintTop_toBottomOf="@+id/iv_image" />
+        app:layout_constraintStart_toStartOf="@+id/rl_image"
+        app:layout_constraintTop_toBottomOf="@+id/rl_image" />
 
     <ImageView
         android:id="@+id/iv_alert"

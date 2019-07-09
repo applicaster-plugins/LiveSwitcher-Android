@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_live_switcher"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,20 +13,12 @@
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="20dp" />
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/nsv_lists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/feed_grey"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@+id/rl_player">
 

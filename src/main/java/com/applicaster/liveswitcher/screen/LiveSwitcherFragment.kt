@@ -1,6 +1,6 @@
 package com.applicaster.liveswitcher.screen
 
-import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +15,6 @@ import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
-import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
@@ -100,23 +99,41 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     private fun setUpView() {
-        nsv_lists.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
+        cl_live_switcher.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
 
         tv_header_live.text = LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT)
         tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
         tv_header_live.textSize = LiveSwitcherUtil.getFloat(
                 LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_FONTSIZE))
-        tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+
+        var drawable = tv_header_live.background
+        if(drawable is GradientDrawable) {
+            drawable.setColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+            v_header_live?.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+        } else {
+            tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+        }
 
         tv_header_next.text = LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT)
         tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
         tv_header_next.textSize = LiveSwitcherUtil.getFloat(
                 LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_FONTSIZE))
-        tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+
+        drawable = tv_header_next.background
+        if(drawable is GradientDrawable) {
+            drawable.setColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+            v_header_next?.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+        } else {
+            tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+        }
     }
 
     private fun playFirstItem(liveItems: List<APAtomEntry>) {
