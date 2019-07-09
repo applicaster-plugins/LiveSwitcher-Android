@@ -38,6 +38,7 @@ import com.applicaster.model.APProgram
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.applicaster.util.AlarmManagerUtil
+import com.applicaster.util.OSUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
@@ -50,6 +51,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     var entries: List<APAtomEntry>? = null
     var channels: List<ChannelModel.Channel>? = null
     var playerContract: PlayerContract? = null
+    var currentAtomEntry: APAtomEntry? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -131,7 +133,8 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                           isLive: Boolean) {
         recyclerView?.let {
             recyclerView.visibility = View.VISIBLE
-            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.layoutManager = if (!OSUtil.isTablet()) LinearLayoutManager(context)
+            else LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
             ViewCompat.setNestedScrollingEnabled(recyclerView, false)
         }
@@ -151,7 +154,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
-
+        this.currentAtomEntry = atomEntry
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
 
@@ -168,6 +171,18 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         playerContract?.let {
             it.attachInline(rl_player)
             it.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerContract?.stopInline()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        currentAtomEntry?.let {
+            playerContract?.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(it.playable))
         }
     }
 
