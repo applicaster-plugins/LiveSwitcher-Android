@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.1
+- General code cleanup.
+
 ## 0.2.0
 - Now Live Switcher has an improved UI for tablet screens.
 
