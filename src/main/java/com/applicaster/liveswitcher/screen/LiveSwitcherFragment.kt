@@ -77,13 +77,18 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                             // recycler view with the live content
                             val liveItems = LiveSwitcherUtil
                                     .getLiveAtoms(this@LiveSwitcherFragment.entries)
+
+                            pb_loading.visibility = View.GONE
+
                             tv_header_live.visibility = View.VISIBLE
+                            v_header_live?.visibility = View.VISIBLE
                             setUpRecyclerView(rv_live, liveItems,
                                     this@LiveSwitcherFragment.channels, true)
                             playFirstItem(liveItems)
 
                             // recycler view with the content that goes next
                             tv_header_next.visibility = View.VISIBLE
+                            v_header_next?.visibility = View.VISIBLE
                             setUpRecyclerView(rv_next, LiveSwitcherUtil
                                     .getNextAtoms(this@LiveSwitcherFragment.entries),
                                     this@LiveSwitcherFragment.channels, false)

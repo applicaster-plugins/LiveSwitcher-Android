@@ -38,7 +38,7 @@
                 android:text="En vivo"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -48,6 +48,7 @@
                 android:id="@+id/v_header_live"
                 android:layout_width="20dp"
                 android:layout_height="4dp"
+                android:visibility="gone"
                 android:background="@color/black"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_header_live"
                 app:layout_constraintEnd_toStartOf="@+id/tv_header_live"
@@ -60,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +78,7 @@
                 android:text="En vivo"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -87,6 +88,7 @@
                 android:id="@+id/v_header_next"
                 android:layout_width="20dp"
                 android:layout_height="4dp"
+                android:visibility="gone"
                 android:background="@color/black"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_header_next"
                 app:layout_constraintEnd_toStartOf="@+id/tv_header_next"
@@ -100,7 +102,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="380dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -108,4 +110,13 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_header_next" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
