@@ -8,6 +8,9 @@ import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.SIMPLE_DATE_FORMAT
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.login.LoginContract
@@ -31,9 +34,9 @@ class LiveSwitcherUtil {
             entries.forEach {
                 programs.add(ProgramModel.Program(
                         it.title,
-                        it.extensions?.get("start_time").toString(),
-                        it.extensions?.get("end_time").toString(),
-                        it.extensions?.get("applicaster_channel_id").toString(),
+                        it.extensions?.get(EXTENSION_START_TIME).toString(),
+                        it.extensions?.get(EXTENSION_END_TIME).toString(),
+                        it.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString(),
                         it.mediaGroups[0].mediaItems[0].src,
                         it.title,
                         it.summary,
@@ -46,8 +49,8 @@ class LiveSwitcherUtil {
         fun getLiveAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val liveAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get("start_time").toString()) < getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) < getCurrentDate()
+                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     liveAtoms.add(it)
                 }
             }
@@ -57,8 +60,8 @@ class LiveSwitcherUtil {
         fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val nextAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get("start_time").toString()) > getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate()
+                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     nextAtoms.add(it)
                 }
             }

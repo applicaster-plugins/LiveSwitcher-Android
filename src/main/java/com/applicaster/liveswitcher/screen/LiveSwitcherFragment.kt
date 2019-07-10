@@ -1,6 +1,5 @@
 package com.applicaster.liveswitcher.screen
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -26,9 +25,15 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
-import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getChannelsFromAtom
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getConfigurationFromPlayable
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getDateInMillis
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getFloat
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getLiveAtoms
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getNextAtoms
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getParam
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.parseColor
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.setViewBackground
 import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
@@ -69,18 +74,19 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
 
         tv_header_live.text = getParam(CONF_LIVE_HEADER_TEXT)
         tv_header_live.setTextColor(parseColor(getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
-        tv_header_live.textSize = LiveSwitcherUtil.getFloat(getParam(CONF_LIVE_HEADER_FONTSIZE))
-
+        tv_header_live.textSize = getFloat(getParam(CONF_LIVE_HEADER_FONTSIZE))
+        // v_header_live is only showed in tablet
         v_header_live?.setBackgroundColor(parseColor(getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-        LiveSwitcherUtil.setViewBackground(tv_header_live, CONF_LIVE_HEADER_BACKGROUND_COLOR)
+
+        setViewBackground(tv_header_live, CONF_LIVE_HEADER_BACKGROUND_COLOR)
 
         tv_header_next.text = getParam(CONF_NEXT_HEADER_TEXT)
         tv_header_next.setTextColor(parseColor(getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
-        tv_header_next.textSize = LiveSwitcherUtil.getFloat(getParam(CONF_NEXT_HEADER_FONTSIZE))
-
-
+        tv_header_next.textSize = getFloat(getParam(CONF_NEXT_HEADER_FONTSIZE))
+        // v_header_next is only showed in tablet
         v_header_next?.setBackgroundColor(parseColor(getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-        LiveSwitcherUtil.setViewBackground(tv_header_next, CONF_NEXT_HEADER_BACKGROUND_COLOR)
+
+        setViewBackground(tv_header_next, CONF_NEXT_HEADER_BACKGROUND_COLOR)
     }
 
     override fun showProgress() {
@@ -89,31 +95,28 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
 
     override fun hideProgress() {
         pb_loading.visibility = View.GONE
+        // live header
+        tv_header_live.visibility = View.VISIBLE
+        v_header_live?.visibility = View.VISIBLE
+        // next header
+        tv_header_next.visibility = View.VISIBLE
+        v_header_next?.visibility = View.VISIBLE
     }
 
     override fun onAtomsFetchedSuccessfully(atomEntries: List<APAtomEntry>, extensions: Map<String, Any>) {
         // save globally the entries
         entries = atomEntries
         // get channels to get the logo later
-        channels = LiveSwitcherUtil.getChannelsFromAtom(extensions)
+        channels = getChannelsFromAtom(extensions)
 
         // recycler view with the live content
-        val liveItems = LiveSwitcherUtil.getLiveAtoms(entries)
+        val liveItems = getLiveAtoms(entries)
 
-        pb_loading.visibility = View.GONE
-
-        tv_header_live.visibility = View.VISIBLE
-        v_header_live?.visibility = View.VISIBLE
-        setUpRecyclerView(rv_live, liveItems,
-                channels, true)
+        setUpRecyclerView(rv_live, liveItems, channels, true)
         playFirstItem(liveItems)
 
         // recycler view with the content that goes next
-        tv_header_next.visibility = View.VISIBLE
-        v_header_next?.visibility = View.VISIBLE
-        setUpRecyclerView(rv_next, LiveSwitcherUtil
-                .getNextAtoms(entries),
-                channels, false)
+        setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
     }
 
     override fun onAtomsFetchedFail() {
@@ -137,6 +140,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
             recyclerView.layoutManager = if (!OSUtil.isTablet()) LinearLayoutManager(context)
             else LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
+            // this enables the smooth scroll in the nested scroll view
             ViewCompat.setNestedScrollingEnabled(recyclerView, false)
         }
     }
@@ -145,16 +149,16 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
     override fun heartbeat() {
         entries?.let {
             // recycler view with the live content
-            setUpRecyclerView(rv_live, LiveSwitcherUtil.getLiveAtoms(entries),
-                    channels, true)
+            setUpRecyclerView(rv_live, getLiveAtoms(entries), channels, true)
 
             // recycler view with the content that goes next
-            setUpRecyclerView(rv_next, LiveSwitcherUtil.getNextAtoms(entries),
-                    channels, false)
+            setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
         }
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
+        // saving the current atom entry to manage it when the app goes to pause mode and then resumes
+        // (see onPause() and onResume() methods)
         this.currentAtomEntry = atomEntry
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
@@ -171,7 +175,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
 
         playerContract?.let {
             it.attachInline(rl_player)
-            it.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
+            it.playInline(getConfigurationFromPlayable(atomEntry.playable))
         }
     }
 
@@ -183,7 +187,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
     override fun onResume() {
         super.onResume()
         currentAtomEntry?.let {
-            playerContract?.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(it.playable))
+            playerContract?.playInline(getConfigurationFromPlayable(it.playable))
         }
     }
 
@@ -200,7 +204,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
         val programAsJson = SerializationUtils.toJson(programImageHolder)
 
         context?.let {
-            AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, LiveSwitcherUtil.getDateInMillis(program.starts_at))
+            AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, getDateInMillis(program.starts_at))
         }
     }
 
@@ -209,6 +213,4 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
             AlarmManagerUtil.removeIfExistsInReminder(it, atomEntry.id)
         }
     }
-
-
 }
