@@ -1,6 +1,6 @@
 package com.applicaster.liveswitcher.screen
 
-import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +15,6 @@ import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
-import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
@@ -38,6 +37,7 @@ import com.applicaster.model.APProgram
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
 import com.applicaster.plugin_manager.playersmanager.internal.PlayersManager
 import com.applicaster.util.AlarmManagerUtil
+import com.applicaster.util.OSUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
@@ -50,6 +50,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     var entries: List<APAtomEntry>? = null
     var channels: List<ChannelModel.Channel>? = null
     var playerContract: PlayerContract? = null
+    var currentAtomEntry: APAtomEntry? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -76,13 +77,18 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                             // recycler view with the live content
                             val liveItems = LiveSwitcherUtil
                                     .getLiveAtoms(this@LiveSwitcherFragment.entries)
+
+                            pb_loading.visibility = View.GONE
+
                             tv_header_live.visibility = View.VISIBLE
+                            v_header_live?.visibility = View.VISIBLE
                             setUpRecyclerView(rv_live, liveItems,
                                     this@LiveSwitcherFragment.channels, true)
                             playFirstItem(liveItems)
 
                             // recycler view with the content that goes next
                             tv_header_next.visibility = View.VISIBLE
+                            v_header_next?.visibility = View.VISIBLE
                             setUpRecyclerView(rv_next, LiveSwitcherUtil
                                     .getNextAtoms(this@LiveSwitcherFragment.entries),
                                     this@LiveSwitcherFragment.channels, false)
@@ -98,23 +104,41 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     private fun setUpView() {
-        nsv_lists.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
+        cl_live_switcher.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
 
         tv_header_live.text = LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT)
         tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
         tv_header_live.textSize = LiveSwitcherUtil.getFloat(
                 LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_FONTSIZE))
-        tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+
+        var drawable = tv_header_live.background
+        if(drawable is GradientDrawable) {
+            drawable.setColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+            v_header_live?.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+        } else {
+            tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+        }
 
         tv_header_next.text = LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT)
         tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
         tv_header_next.textSize = LiveSwitcherUtil.getFloat(
                 LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_FONTSIZE))
-        tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+
+        drawable = tv_header_next.background
+        if(drawable is GradientDrawable) {
+            drawable.setColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+            v_header_next?.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+        } else {
+            tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
+                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+        }
     }
 
     private fun playFirstItem(liveItems: List<APAtomEntry>) {
@@ -131,7 +155,8 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
                           isLive: Boolean) {
         recyclerView?.let {
             recyclerView.visibility = View.VISIBLE
-            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.layoutManager = if (!OSUtil.isTablet()) LinearLayoutManager(context)
+            else LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
             ViewCompat.setNestedScrollingEnabled(recyclerView, false)
         }
@@ -151,7 +176,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
-
+        this.currentAtomEntry = atomEntry
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
 
@@ -168,6 +193,18 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         playerContract?.let {
             it.attachInline(rl_player)
             it.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerContract?.stopInline()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        currentAtomEntry?.let {
+            playerContract?.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(it.playable))
         }
     }
 
