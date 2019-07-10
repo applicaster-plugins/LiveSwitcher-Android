@@ -1,23 +1,17 @@
 package com.applicaster.liveswitcher.screen
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.atom.model.APAtomError
-import com.applicaster.atom.model.APAtomFeed
-import com.applicaster.jspipes.JSManager
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
+import com.applicaster.liveswitcher.screen.base.HeartbeatFragment
 import com.applicaster.liveswitcher.utils.Constants.CONF_BACKGROUND_COLOR
 import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_BACKGROUND_COLOR
 import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_FONTSIZE
@@ -31,7 +25,15 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
-import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getChannelsFromAtom
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getConfigurationFromPlayable
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getDateInMillis
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getFloat
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getLiveAtoms
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getNextAtoms
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getParam
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.parseColor
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.setViewBackground
 import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
@@ -41,16 +43,17 @@ import com.applicaster.util.OSUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
-import com.google.gson.internal.LinkedTreeMap
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
-class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickListener {
+class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapter.OnProgramClickListener {
 
     var data: Any? = null
     var entries: List<APAtomEntry>? = null
     var channels: List<ChannelModel.Channel>? = null
     var playerContract: PlayerContract? = null
     var currentAtomEntry: APAtomEntry? = null
+    var liveSwitcherPresenter: LiveSwitcherPresenter = LiveSwitcherPresenter(this,
+            LiveSwitcherInteractor())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -63,86 +66,65 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         setUpView()
 
         // data has value when creating the fragment
-        if (data is LinkedTreeMap<*, *>) {
-            val source = (data as LinkedTreeMap<*, *>)["source"].toString()
-            Handler(Looper.getMainLooper()).post {
-                JSManager.getInstance().get(source, object : JSManager.JSManagerCallback {
-                    override fun onResult(atom: Any) {
-                        Log.d(this.javaClass.simpleName, "onResult")
-                        if (atom is APAtomFeed && atom.entries is ArrayList<APAtomEntry>) {
-                            this@LiveSwitcherFragment.entries = atom.entries
-                            // get channels
-                            this@LiveSwitcherFragment.channels = LiveSwitcherUtil.getChannelsFromAtom(atom.extensions)
-
-                            // recycler view with the live content
-                            val liveItems = LiveSwitcherUtil
-                                    .getLiveAtoms(this@LiveSwitcherFragment.entries)
-
-                            pb_loading.visibility = View.GONE
-
-                            tv_header_live.visibility = View.VISIBLE
-                            v_header_live?.visibility = View.VISIBLE
-                            setUpRecyclerView(rv_live, liveItems,
-                                    this@LiveSwitcherFragment.channels, true)
-                            playFirstItem(liveItems)
-
-                            // recycler view with the content that goes next
-                            tv_header_next.visibility = View.VISIBLE
-                            v_header_next?.visibility = View.VISIBLE
-                            setUpRecyclerView(rv_next, LiveSwitcherUtil
-                                    .getNextAtoms(this@LiveSwitcherFragment.entries),
-                                    this@LiveSwitcherFragment.channels, false)
-                        }
-                    }
-
-                    override fun onError(error: APAtomError) {
-                        Log.d(this.javaClass.simpleName, "onError")
-                    }
-                })
-            }
-        }
+        liveSwitcherPresenter.getAtoms(data)
     }
 
     private fun setUpView() {
-        cl_live_switcher.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
+        cl_live_switcher.setBackgroundColor(parseColor(getParam(CONF_BACKGROUND_COLOR)))
 
-        tv_header_live.text = LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT)
-        tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
-        tv_header_live.textSize = LiveSwitcherUtil.getFloat(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_FONTSIZE))
+        tv_header_live.text = getParam(CONF_LIVE_HEADER_TEXT)
+        tv_header_live.setTextColor(parseColor(getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
+        tv_header_live.textSize = getFloat(getParam(CONF_LIVE_HEADER_FONTSIZE))
+        // v_header_live is only showed in tablet
+        v_header_live?.setBackgroundColor(parseColor(getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
 
-        var drawable = tv_header_live.background
-        if(drawable is GradientDrawable) {
-            drawable.setColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-            v_header_live?.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-        } else {
-            tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-        }
+        setViewBackground(tv_header_live, CONF_LIVE_HEADER_BACKGROUND_COLOR)
 
-        tv_header_next.text = LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT)
-        tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
-        tv_header_next.textSize = LiveSwitcherUtil.getFloat(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_FONTSIZE))
+        tv_header_next.text = getParam(CONF_NEXT_HEADER_TEXT)
+        tv_header_next.setTextColor(parseColor(getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
+        tv_header_next.textSize = getFloat(getParam(CONF_NEXT_HEADER_FONTSIZE))
+        // v_header_next is only showed in tablet
+        v_header_next?.setBackgroundColor(parseColor(getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
 
-        drawable = tv_header_next.background
-        if(drawable is GradientDrawable) {
-            drawable.setColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-            v_header_next?.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-        } else {
-            tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-        }
+        setViewBackground(tv_header_next, CONF_NEXT_HEADER_BACKGROUND_COLOR)
+    }
+
+    override fun showProgress() {
+        pb_loading.visibility = View.VISIBLE
+    }
+
+    override fun hideProgress() {
+        pb_loading.visibility = View.GONE
+        // live header
+        tv_header_live.visibility = View.VISIBLE
+        v_header_live?.visibility = View.VISIBLE
+        // next header
+        tv_header_next.visibility = View.VISIBLE
+        v_header_next?.visibility = View.VISIBLE
+    }
+
+    override fun onAtomsFetchedSuccessfully(atomEntries: List<APAtomEntry>, extensions: Map<String, Any>) {
+        // save globally the entries
+        entries = atomEntries
+        // get channels to get the logo later
+        channels = getChannelsFromAtom(extensions)
+
+        // recycler view with the live content
+        val liveItems = getLiveAtoms(entries)
+
+        setUpRecyclerView(rv_live, liveItems, channels, true)
+        playFirstItem(liveItems)
+
+        // recycler view with the content that goes next
+        setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
+    }
+
+    override fun onAtomsFetchedFail() {
+        // todo: show error dialog
     }
 
     private fun playFirstItem(liveItems: List<APAtomEntry>) {
-        var position = PreferenceUtil.getInstance().getIntPref(PREFERENCE_ITEM_SELECTED_POSITION,
+        val position = PreferenceUtil.getInstance().getIntPref(PREFERENCE_ITEM_SELECTED_POSITION,
                 0)
 
         if (position < liveItems.size) {
@@ -150,14 +132,15 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         }
     }
 
-    fun setUpRecyclerView(recyclerView: RecyclerView?, items: List<APAtomEntry>,
-                          channels: List<ChannelModel.Channel>?,
-                          isLive: Boolean) {
+    private fun setUpRecyclerView(recyclerView: RecyclerView?, items: List<APAtomEntry>,
+                                  channels: List<ChannelModel.Channel>?,
+                                  isLive: Boolean) {
         recyclerView?.let {
             recyclerView.visibility = View.VISIBLE
             recyclerView.layoutManager = if (!OSUtil.isTablet()) LinearLayoutManager(context)
             else LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             recyclerView.adapter = ProgramAdapter(items, channels, context, this, isLive)
+            // this enables the smooth scroll in the nested scroll view
             ViewCompat.setNestedScrollingEnabled(recyclerView, false)
         }
     }
@@ -166,16 +149,16 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     override fun heartbeat() {
         entries?.let {
             // recycler view with the live content
-            setUpRecyclerView(rv_live, LiveSwitcherUtil.getLiveAtoms(entries),
-                    channels, true)
+            setUpRecyclerView(rv_live, getLiveAtoms(entries), channels, true)
 
             // recycler view with the content that goes next
-            setUpRecyclerView(rv_next, LiveSwitcherUtil.getNextAtoms(entries),
-                    channels, false)
+            setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
         }
     }
 
     override fun onProgramClicked(atomEntry: APAtomEntry) {
+        // saving the current atom entry to manage it when the app goes to pause mode and then resumes
+        // (see onPause() and onResume() methods)
         this.currentAtomEntry = atomEntry
         val playersManager = PlayersManager.getInstance()
         val channelId = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID)
@@ -192,7 +175,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
 
         playerContract?.let {
             it.attachInline(rl_player)
-            it.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(atomEntry.playable))
+            it.playInline(getConfigurationFromPlayable(atomEntry.playable))
         }
     }
 
@@ -204,7 +187,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
     override fun onResume() {
         super.onResume()
         currentAtomEntry?.let {
-            playerContract?.playInline(LiveSwitcherUtil.getConfigurationFromPlayable(it.playable))
+            playerContract?.playInline(getConfigurationFromPlayable(it.playable))
         }
     }
 
@@ -221,7 +204,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), ProgramAdapter.OnProgramClickL
         val programAsJson = SerializationUtils.toJson(programImageHolder)
 
         context?.let {
-            AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, LiveSwitcherUtil.getDateInMillis(program.starts_at))
+            AlarmManagerUtil.addProgramToReminder(it, atomEntry.id, programAsJson, getDateInMillis(program.starts_at))
         }
     }
 

@@ -1,11 +1,16 @@
 package com.applicaster.liveswitcher.utils
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.view.View
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
+import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.SIMPLE_DATE_FORMAT
 import com.applicaster.player.VideoAdsUtil
 import com.applicaster.plugin_manager.login.LoginContract
@@ -29,9 +34,9 @@ class LiveSwitcherUtil {
             entries.forEach {
                 programs.add(ProgramModel.Program(
                         it.title,
-                        it.extensions?.get("start_time").toString(),
-                        it.extensions?.get("end_time").toString(),
-                        it.extensions?.get("applicaster_channel_id").toString(),
+                        it.extensions?.get(EXTENSION_START_TIME).toString(),
+                        it.extensions?.get(EXTENSION_END_TIME).toString(),
+                        it.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString(),
                         it.mediaGroups[0].mediaItems[0].src,
                         it.title,
                         it.summary,
@@ -44,8 +49,8 @@ class LiveSwitcherUtil {
         fun getLiveAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val liveAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get("start_time").toString()) < getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) < getCurrentDate()
+                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     liveAtoms.add(it)
                 }
             }
@@ -55,8 +60,8 @@ class LiveSwitcherUtil {
         fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val nextAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get("start_time").toString()) > getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get("end_time").toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate()
+                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     nextAtoms.add(it)
                 }
             }
@@ -65,7 +70,7 @@ class LiveSwitcherUtil {
         }
 
         fun getConfigurationFromPlayable(playable: Playable): PlayableConfiguration {
-            var configuration = PlayableConfiguration()
+            val configuration = PlayableConfiguration()
             val adsConfiguration = AdsConfiguration()
             adsConfiguration.extensionName = VideoAdsUtil.getPrerollExtension(playable.isLive, true)
             configuration.adsConfiguration = adsConfiguration
@@ -108,8 +113,8 @@ class LiveSwitcherUtil {
         }
 
         fun getChannelsFromAtom(extensions: Map<String, Any>): List<ChannelModel.Channel> {
-            var channels = extensions["channels"]
-            var channelsFromAtom = ArrayList<ChannelModel.Channel>()
+            val channels = extensions["channels"]
+            val channelsFromAtom = ArrayList<ChannelModel.Channel>()
             if (channels is ArrayList<*>) {
                 channels.forEach {
                     if (it is LinkedTreeMap<*, *>) {
@@ -157,7 +162,7 @@ class LiveSwitcherUtil {
         }
 
         fun getGmt(time: String): String {
-            var timeZone = time.substring(time.length - 5)
+            val timeZone = time.substring(time.length - 5)
             return String.format("GMT%s", timeZone)
         }
 
@@ -179,6 +184,15 @@ class LiveSwitcherUtil {
 
         fun getParam(key: String) : String {
             return LiveSwitcherContract.configuration?.get(key).toString()
+        }
+
+        fun setViewBackground(view: View, colorKey: String) {
+            val drawable = view.background
+            if(drawable is GradientDrawable) {
+                drawable.setColor(parseColor(getParam(colorKey)))
+            } else {
+                view.setBackgroundColor(parseColor(getParam(colorKey)))
+            }
         }
     }
 }
