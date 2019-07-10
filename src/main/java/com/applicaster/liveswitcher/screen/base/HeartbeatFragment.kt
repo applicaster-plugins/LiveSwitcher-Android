@@ -1,4 +1,4 @@
-package com.applicaster.liveswitcher.screen
+package com.applicaster.liveswitcher.screen.base
 
 import android.os.CountDownTimer
 import android.support.v4.app.Fragment
