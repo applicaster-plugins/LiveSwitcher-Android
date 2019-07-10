@@ -9,7 +9,7 @@
   "platform": "android",
   "author_name": "Juan Hernandez",
   "author_email": "j.hernandez@applicaster.com",
-  "manifest_version": "0.1.1",
+  "manifest_version": "0.2.0",
   "name": "LiveSwitcher",
   "description": "Native live switcher",
   "type": "general",
@@ -17,7 +17,7 @@
   "identifier": "LiveSwitcher",
   "ui_builder_support": true,
   "dependency_name": "com.applicaster:LiveSwitcher-Android",
-  "dependency_version": "0.1.1",
+  "dependency_version": "0.2.0",
   "whitelisted_account_ids": [
     "5a53d5ec9349a1000ecadf69",
     "5a67970eacc8d7000cf98db0"
