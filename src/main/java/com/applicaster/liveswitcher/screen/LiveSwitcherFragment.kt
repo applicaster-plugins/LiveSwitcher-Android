@@ -27,6 +27,8 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getParam
+import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.parseColor
 import com.applicaster.model.APChannel
 import com.applicaster.model.APProgram
 import com.applicaster.plugin_manager.playersmanager.PlayerContract
@@ -63,41 +65,22 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
     }
 
     private fun setUpView() {
-        cl_live_switcher.setBackgroundColor(LiveSwitcherUtil.parseColor(LiveSwitcherUtil.getParam(CONF_BACKGROUND_COLOR)))
+        cl_live_switcher.setBackgroundColor(parseColor(getParam(CONF_BACKGROUND_COLOR)))
 
-        tv_header_live.text = LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT)
-        tv_header_live.setTextColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
-        tv_header_live.textSize = LiveSwitcherUtil.getFloat(
-                LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_FONTSIZE))
+        tv_header_live.text = getParam(CONF_LIVE_HEADER_TEXT)
+        tv_header_live.setTextColor(parseColor(getParam(CONF_LIVE_HEADER_TEXT_COLOR)))
+        tv_header_live.textSize = LiveSwitcherUtil.getFloat(getParam(CONF_LIVE_HEADER_FONTSIZE))
 
-        var drawable = tv_header_live.background
-        if(drawable is GradientDrawable) {
-            drawable.setColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-            v_header_live?.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-        } else {
-            tv_header_live.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
-        }
+        v_header_live?.setBackgroundColor(parseColor(getParam(CONF_LIVE_HEADER_BACKGROUND_COLOR)))
+        LiveSwitcherUtil.setViewBackground(tv_header_live, CONF_LIVE_HEADER_BACKGROUND_COLOR)
 
-        tv_header_next.text = LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT)
-        tv_header_next.setTextColor(LiveSwitcherUtil.parseColor(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
-        tv_header_next.textSize = LiveSwitcherUtil.getFloat(
-                LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_FONTSIZE))
+        tv_header_next.text = getParam(CONF_NEXT_HEADER_TEXT)
+        tv_header_next.setTextColor(parseColor(getParam(CONF_NEXT_HEADER_TEXT_COLOR)))
+        tv_header_next.textSize = LiveSwitcherUtil.getFloat(getParam(CONF_NEXT_HEADER_FONTSIZE))
 
-        drawable = tv_header_next.background
-        if(drawable is GradientDrawable) {
-            drawable.setColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-            v_header_next?.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-        } else {
-            tv_header_next.setBackgroundColor(LiveSwitcherUtil.parseColor(
-                    LiveSwitcherUtil.getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
-        }
+
+        v_header_next?.setBackgroundColor(parseColor(getParam(CONF_NEXT_HEADER_BACKGROUND_COLOR)))
+        LiveSwitcherUtil.setViewBackground(tv_header_next, CONF_NEXT_HEADER_BACKGROUND_COLOR)
     }
 
     override fun showProgress() {

@@ -1,6 +1,8 @@
 package com.applicaster.liveswitcher.utils
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.view.View
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
@@ -65,7 +67,7 @@ class LiveSwitcherUtil {
         }
 
         fun getConfigurationFromPlayable(playable: Playable): PlayableConfiguration {
-            var configuration = PlayableConfiguration()
+            val configuration = PlayableConfiguration()
             val adsConfiguration = AdsConfiguration()
             adsConfiguration.extensionName = VideoAdsUtil.getPrerollExtension(playable.isLive, true)
             configuration.adsConfiguration = adsConfiguration
@@ -108,8 +110,8 @@ class LiveSwitcherUtil {
         }
 
         fun getChannelsFromAtom(extensions: Map<String, Any>): List<ChannelModel.Channel> {
-            var channels = extensions["channels"]
-            var channelsFromAtom = ArrayList<ChannelModel.Channel>()
+            val channels = extensions["channels"]
+            val channelsFromAtom = ArrayList<ChannelModel.Channel>()
             if (channels is ArrayList<*>) {
                 channels.forEach {
                     if (it is LinkedTreeMap<*, *>) {
@@ -157,7 +159,7 @@ class LiveSwitcherUtil {
         }
 
         fun getGmt(time: String): String {
-            var timeZone = time.substring(time.length - 5)
+            val timeZone = time.substring(time.length - 5)
             return String.format("GMT%s", timeZone)
         }
 
@@ -179,6 +181,15 @@ class LiveSwitcherUtil {
 
         fun getParam(key: String) : String {
             return LiveSwitcherContract.configuration?.get(key).toString()
+        }
+
+        fun setViewBackground(view: View, colorKey: String) {
+            val drawable = view.background
+            if(drawable is GradientDrawable) {
+                drawable.setColor(parseColor(getParam(colorKey)))
+            } else {
+                view.setBackgroundColor(parseColor(getParam(colorKey)))
+            }
         }
     }
 }
