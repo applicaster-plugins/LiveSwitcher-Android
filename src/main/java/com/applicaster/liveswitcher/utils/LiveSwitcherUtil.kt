@@ -4,8 +4,8 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import com.applicaster.atom.model.APAtomEntry
+import com.applicaster.lesscodeutils.date.DateUtils.Companion.getCurrentDate
 import com.applicaster.liveswitcher.LiveSwitcherContract
-import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.model.ProgramModel
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
@@ -13,17 +13,14 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.SIMPLE_DATE_FORMAT
 import com.applicaster.player.VideoAdsUtil
-import com.applicaster.plugin_manager.login.LoginContract
 import com.applicaster.plugin_manager.playersmanager.AdsConfiguration
 import com.applicaster.plugin_manager.playersmanager.Playable
 import com.applicaster.plugin_manager.playersmanager.PlayableConfiguration
-import com.applicaster.util.PreferenceUtil
 import com.google.gson.internal.LinkedTreeMap
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import java.text.ParseException
-import java.time.format.DateTimeFormatter
 
 
 class LiveSwitcherUtil {
@@ -49,8 +46,8 @@ class LiveSwitcherUtil {
         fun getLiveAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val liveAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) < getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) < getCurrentDate(SIMPLE_DATE_FORMAT)
+                        && getCurrentDate(SIMPLE_DATE_FORMAT) < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     liveAtoms.add(it)
                 }
             }
@@ -60,8 +57,8 @@ class LiveSwitcherUtil {
         fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
             val nextAtoms = ArrayList<APAtomEntry>()
             entries?.forEach {
-                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate()
-                        && getCurrentDate() < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
+                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate(SIMPLE_DATE_FORMAT)
+                        && getCurrentDate(SIMPLE_DATE_FORMAT) < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
                     nextAtoms.add(it)
                 }
             }
@@ -75,12 +72,6 @@ class LiveSwitcherUtil {
             adsConfiguration.extensionName = VideoAdsUtil.getPrerollExtension(playable.isLive, true)
             configuration.adsConfiguration = adsConfiguration
             return configuration
-        }
-
-        fun getCurrentDate(): String {
-            val date = Date()
-            val dateFormat = SimpleDateFormat(SIMPLE_DATE_FORMAT, Locale.getDefault())
-            return dateFormat.format(date)
         }
 
         fun getDateFormatted(date: String): String {

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LiveSwitcher</string>
+    <string name="error_dialog_title">Something happened</string>
+    <string name="error_dialog_message">Something happened that is causing the content not being loaded. Try again when you can please.</string>
 </resources>
