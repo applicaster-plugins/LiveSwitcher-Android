@@ -59,9 +59,16 @@ dependencies {
     // Check if an open SDK is defined - if not use the closed one.
     def devSDK = findProject(':applicaster-android-sdk')
     if (devSDK != null) {
-        api (project(":applicaster-android-sdk"))
+        api(project(":applicaster-android-sdk"))
     } else {
-        api ("com.applicaster:applicaster-android-sdk:2.33.0")
+        api("com.applicaster:applicaster-android-sdk:2.33.0")
+    }
+
+    def lessCodeLib = findProject(':LessCodeUtils')
+    if (lessCodeLib != null) {
+        api(project(":LessCodeUtils"))
+    } else {
+        api("com.applicaster:LessCodeUtils-Android:0.0.1")
     }
 
     implementation 'com.github.bumptech.glide:glide:4.6.1'
