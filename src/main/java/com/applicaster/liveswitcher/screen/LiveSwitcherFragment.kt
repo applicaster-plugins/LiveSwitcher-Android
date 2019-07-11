@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
 import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.getAlertDialog
+import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.showAlertDialog
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.screen.adapter.ProgramAdapter
@@ -123,9 +124,9 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
 
     override fun onAtomsFetchedFail() {
         context?.let {
-            getAlertDialog(it, resources.getString(R.string.error_dialog_title),
+            showAlertDialog(it, resources.getString(R.string.error_dialog_title),
                     resources.getString(R.string.error_dialog_message), resources.getString(R.string.ok_btn),
-                    DialogInterface.OnClickListener { _, _ -> liveSwitcherPresenter.getAtoms(data) }).show()
+                    DialogInterface.OnClickListener { _, _ -> liveSwitcherPresenter.getAtoms(data) })
         }
     }
 
