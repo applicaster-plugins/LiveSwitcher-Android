@@ -4,10 +4,6 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.util.Log
 import com.applicaster.liveswitcher.screen.LiveSwitcherFragment
-import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_FONTSIZE
-import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_TEXT
-import com.applicaster.liveswitcher.utils.Constants.CONF_LIVE_HEADER_TEXT_COLOR
-import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.plugin_manager.screen.PluginScreen
 import com.google.gson.internal.LinkedTreeMap
 import java.io.Serializable

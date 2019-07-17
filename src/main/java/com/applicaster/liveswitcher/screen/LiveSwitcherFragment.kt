@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.getAlertDialog
 import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.showAlertDialog
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel

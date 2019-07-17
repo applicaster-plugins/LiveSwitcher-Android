@@ -22,6 +22,8 @@ import com.applicaster.util.PreferenceUtil
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.ViewTarget
 import kotlinx.android.synthetic.main.item_program.view.*
+import com.bumptech.glide.request.RequestOptions
+
 
 class ProgramAdapter(private val items: List<APAtomEntry>, private val channels: List<ChannelModel.Channel>?,
                      private val context: Context?, private val listener: OnProgramClickListener,
@@ -51,18 +53,23 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
 //        }
 
         context?.let {
-            val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
-                holder.reminderAssetActive
+            val drawable = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+                R.drawable.set_reminder_asset
             } else {
-                holder.reminderAssetInactive
-            }
-            // set alarm icon depending on if the reminder is set or not
-            assetUrl?.let {
-                Glide.with(context).asDrawable().load(assetUrl).into(holder.ivAlert)
+                R.drawable.remove_reminder_asset
             }
 
+            val requestOptions = RequestOptions()
+            // set alarm icon depending on if the reminder is set or not
+            Glide.with(context)
+                    .setDefaultRequestOptions(requestOptions.placeholder(R.drawable.program_card_placeholder))
+                    .load(drawable)
+                    .into(holder.ivAlert)
+
             // load image of the program
-            Glide.with(context).asDrawable().load(items[position].mediaGroups[0].mediaItems[0].src)
+            Glide.with(context)
+                    .setDefaultRequestOptions(requestOptions.placeholder(R.drawable.program_card_placeholder))
+                    .load(items[position].mediaGroups[0].mediaItems[0].src)
                     .into(holder.ivImage)
 
             // load logo of the channel
@@ -108,10 +115,14 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
             ViewTarget<ImageView, Drawable> {
         return if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
             listener.removeReminder(items[position])
-            Glide.with(context).asDrawable().load(holder.reminderAssetInactive).into(holder.ivAlert)
+            Glide.with(context)
+                    .load(R.drawable.remove_reminder_asset)
+                    .into(holder.ivAlert)
         } else {
             listener.addReminder(items[position])
-            Glide.with(context).asDrawable().load(holder.reminderAssetActive).into(holder.ivAlert)
+            Glide.with(context)
+                    .load(R.drawable.set_reminder_asset)
+                    .into(holder.ivAlert)
         }
     }
 
@@ -130,8 +141,6 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvIsWatching = view.tv_is_watching
     var ivChannel = view.iv_channel
     var tvLiveEvent = view.tv_live_event
-    var reminderAssetActive: String? = null
-    var reminderAssetInactive: String? = null
 
     init {
         tvProgramName.setTextColor(LiveSwitcherUtil.parseColor(
@@ -159,8 +168,5 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
                 LiveSwitcherUtil.getParam(Constants.CONF_WATCHING_TAG_TEXT_FONTSIZE))
         tvLiveEvent.setBackgroundColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(Constants.CONF_LIVE_EVENT_TAG_TEXT_BACKGROUND_COLOR)))
-
-        reminderAssetActive = LiveSwitcherUtil.getParam(Constants.CONF_REMINDER_ASSET_SELECTED)
-        reminderAssetInactive = LiveSwitcherUtil.getParam(CONF_REMINDER_ASSET)
     }
 }
