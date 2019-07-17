@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.getAlertDialog
 import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.showAlertDialog
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
@@ -28,6 +27,7 @@ import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
+import com.applicaster.liveswitcher.utils.Constants.VIDEO_ADS
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getChannelsFromAtom
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getConfigurationFromPlayable
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil.Companion.getDateInMillis
@@ -46,6 +46,9 @@ import com.applicaster.util.OSUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
+import com.google.gson.Gson
+import com.google.gson.internal.LinkedTreeMap
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
 class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapter.OnProgramClickListener {
@@ -175,6 +178,12 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
         channelId?.let {
             val apChannel = APChannel()
             apChannel.id = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()
+
+            atomEntry.extensions?.get(VIDEO_ADS)?.let {
+                val ads: List<LinkedTreeMap<String, String>> = atomEntry.extensions?.get(VIDEO_ADS) as List<LinkedTreeMap<String, String>>
+                apChannel.preroll_url = getPrerollFromAds(ads)
+            }
+
             playerContract = playersManager.createPlayer(apChannel, context)
         } ?: run {
             playerContract = playersManager.createPlayer(atomEntry.playable, context)
@@ -184,6 +193,10 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
             it.attachInline(rl_player)
             it.playInline(getConfigurationFromPlayable(atomEntry.playable))
         }
+    }
+
+    private fun getPrerollFromAds(ads: List<LinkedTreeMap<String, String>>): String? {
+        return ads.filter { it["offset"] == "preroll" }[0]["ad_url"]
     }
 
     override fun onPause() {
