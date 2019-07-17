@@ -1,26 +1,26 @@
 package com.applicaster.liveswitcher.screen.adapter
 
 import android.content.Context
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.utils.Constants
 import com.applicaster.liveswitcher.utils.Constants.CONF_REMINDER_ASSET
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
-import com.applicaster.liveswitcher.utils.Constants.EXTENSION_IS_LIVE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.PreferenceUtil
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.ViewTarget
 import kotlinx.android.synthetic.main.item_program.view.*
 
 class ProgramAdapter(private val items: List<APAtomEntry>, private val channels: List<ChannelModel.Channel>?,
@@ -82,6 +82,11 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
             }
         } else {
             holder.ivAlert.visibility = View.VISIBLE
+            holder.itemView.setOnClickListener {
+                context?.let {
+                    toggleReminder(it, position, holder)
+                }
+            }
         }
 
         if (isLive && (PreferenceUtil.getInstance()
@@ -94,14 +99,19 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
 
         holder.ivAlert.setOnClickListener {
             context?.let {
-                if (AlarmManagerUtil.isAlarmSet(it, items[position].id)) {
-                    listener.removeReminder(items[position])
-                    Glide.with(context).asDrawable().load(holder.reminderAssetInactive).into(holder.ivAlert)
-                } else {
-                    listener.addReminder(items[position])
-                    Glide.with(context).asDrawable().load(holder.reminderAssetActive).into(holder.ivAlert)
-                }
+                toggleReminder(it, position, holder)
             }
+        }
+    }
+
+    private fun toggleReminder(context: Context, position: Int, holder: ProgramViewHolder):
+            ViewTarget<ImageView, Drawable> {
+        return if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+            listener.removeReminder(items[position])
+            Glide.with(context).asDrawable().load(holder.reminderAssetInactive).into(holder.ivAlert)
+        } else {
+            listener.addReminder(items[position])
+            Glide.with(context).asDrawable().load(holder.reminderAssetActive).into(holder.ivAlert)
         }
     }
 
