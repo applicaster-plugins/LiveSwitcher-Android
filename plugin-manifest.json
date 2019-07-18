@@ -20,7 +20,8 @@
   "dependency_version": "0.2.3",
   "whitelisted_account_ids": [
     "5a53d5ec9349a1000ecadf69",
-    "5a67970eacc8d7000cf98db0"
+    "5a67970eacc8d7000cf98db0",
+    "56e13de23336651221000000"
   ],
   "min_zapp_sdk": "8.0.0",
   "deprecated_since_zapp_sdk": "",
