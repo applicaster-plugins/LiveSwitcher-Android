@@ -61,7 +61,7 @@ dependencies {
     if (devSDK != null) {
         api(project(":applicaster-android-sdk"))
     } else {
-        api("com.applicaster:applicaster-android-sdk:2.33.0")
+        api("com.applicaster:applicaster-android-sdk:2.38.0")
     }
 
     def lessCodeLib = findProject(':LessCodeUtils')
