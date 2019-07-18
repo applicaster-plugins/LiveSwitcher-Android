@@ -54,16 +54,13 @@ class LiveSwitcherUtil {
             return liveAtoms
         }
 
-        fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry> {
-            val nextAtoms = ArrayList<APAtomEntry>()
-            entries?.forEach {
-                if (getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate(SIMPLE_DATE_FORMAT)
-                        && getCurrentDate(SIMPLE_DATE_FORMAT) < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())) {
-                    nextAtoms.add(it)
-                }
+        fun getNextAtoms(entries: List<APAtomEntry>?): List<APAtomEntry>? {
+            val nextAtoms = entries?.filter {
+                getDateFormatted(it.extensions?.get(EXTENSION_START_TIME).toString()) > getCurrentDate(SIMPLE_DATE_FORMAT)
+                        && getCurrentDate(SIMPLE_DATE_FORMAT) < getDateFormatted(it.extensions?.get(EXTENSION_END_TIME).toString())
             }
 
-            return nextAtoms
+            return nextAtoms?.sortedWith(compareBy { it.extensions?.get(EXTENSION_START_TIME).toString() })
         }
 
         fun getConfigurationFromPlayable(playable: Playable): PlayableConfiguration {

@@ -33,6 +33,6 @@ object Constants {
     const val CONF_LIVE_CHANNEL_ICON_HEIGHT = "ls_channel_icon_height"
     const val CONF_LIVE_CHANNEL_ICON_WIDTH = "ls_channel_icon_width"
     const val CONF_BACKGROUND_COLOR = "ls_background_color"
-    const val CONF_REMINDER_ASSET_SELECTED = "ls_reminder_asset_selected"
-    const val CONF_REMINDER_ASSET = "ls_reminder_asset"
+    const val CONF_SET_REMINDER_TEXT = "ls_set_reminder_text"
+    const val CONF_REMOVE_REMINDER_TEXT = "ls_remove_reminder_text"
 }

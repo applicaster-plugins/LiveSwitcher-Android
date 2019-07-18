@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.getAlertDialog
 import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.showAlertDialog
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
@@ -119,7 +118,9 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
         playFirstItem(liveItems)
 
         // recycler view with the content that goes next
-        setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
+        getNextAtoms(entries)?.let {
+            setUpRecyclerView(rv_next, it, channels, false)
+        }
     }
 
     override fun onAtomsFetchedFail() {
@@ -159,7 +160,9 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
             setUpRecyclerView(rv_live, getLiveAtoms(entries), channels, true)
 
             // recycler view with the content that goes next
-            setUpRecyclerView(rv_next, getNextAtoms(entries), channels, false)
+            getNextAtoms(entries)?.let {
+                setUpRecyclerView(rv_next, it, channels, false)
+            }
         }
     }
 

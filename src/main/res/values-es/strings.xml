@@ -3,4 +3,6 @@
     <string name="app_name">LiveSwitcher</string>
     <string name="error_dialog_message">El contenido está teniendo problemas para mostrarse. Por favor, trate de nuevo cuando pueda.</string>
     <string name="error_dialog_title">Algo pasó</string>
+    <string name="reminder_removed">Recordatorio removido</string>
+    <string name="reminder_set">Recordatorio agregado</string>
 </resources>

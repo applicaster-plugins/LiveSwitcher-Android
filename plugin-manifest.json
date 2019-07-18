@@ -20,14 +20,19 @@
   "dependency_version": "0.2.3",
   "whitelisted_account_ids": [
     "5a53d5ec9349a1000ecadf69",
-    "5a67970eacc8d7000cf98db0"
+    "5a67970eacc8d7000cf98db0",
+    "56e13de23336651221000000"
   ],
   "min_zapp_sdk": "8.0.0",
   "deprecated_since_zapp_sdk": "",
   "unsupported_since_zapp_sdk": "",
   "react_native": false,
   "custom_configuration_fields": [
-
+    {
+      "type": "uploader",
+      "key": "android_assets_bundle",
+      "tooltip_text": "Upload a Zip file following the folder structure and hierarchy guideline of the platform. The Zip file will be extracted during the build time and will add the assets to the resources of the bundle/package. This field does not affect runtime and a change will require a new build of the app version."
+    }
   ],
   "data": {
     "fields": [
@@ -215,18 +220,18 @@
         "type": "color_picker"
       },
       {
-        "key": "ls_reminder_asset_selected",
-        "label": "Reminder image when active",
-        "placeholder": "Reminder image when active",
-        "label_tooltip": "Reminder image when active",
-        "type": "uploader"
+        "key": "ls_set_reminder_text",
+        "label": "Text message showed to the user when actives a reminder.",
+        "placeholder": "Set reminder text",
+        "label_tooltip": "Set reminder text",
+        "type": "text_input"
       },
       {
-        "key": "ls_reminder_asset",
-        "label": "Reminder image when unactive",
-        "placeholder": "Reminder image when unactive",
-        "label_tooltip": "Reminder image when unactive",
-        "type": "uploader"
+        "key": "ls_remove_reminder_text",
+        "label": "Text message showed to the user when removes a reminder.",
+        "placeholder": "Remove reminder text",
+        "label_tooltip": "Remove reminder text",
+        "type": "text_input"
       }
     ]
   }

@@ -1,27 +1,28 @@
 package com.applicaster.liveswitcher.screen.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.applicaster.app.CustomApplication
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.liveswitcher.LiveSwitcherContract
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
 import com.applicaster.liveswitcher.utils.Constants
-import com.applicaster.liveswitcher.utils.Constants.CONF_REMINDER_ASSET
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_APPLICASTER_CHANNEL_ID
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_END_TIME
-import com.applicaster.liveswitcher.utils.Constants.EXTENSION_IS_LIVE
 import com.applicaster.liveswitcher.utils.Constants.EXTENSION_START_TIME
 import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POSITION
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.PreferenceUtil
+import com.applicaster.util.StringUtil
+import com.applicaster.util.ui.Toaster
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.item_program.view.*
+
 
 class ProgramAdapter(private val items: List<APAtomEntry>, private val channels: List<ChannelModel.Channel>?,
                      private val context: Context?, private val listener: OnProgramClickListener,
@@ -51,18 +52,22 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
 //        }
 
         context?.let {
-            val assetUrl = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
-                holder.reminderAssetActive
+            val drawable = if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+                R.drawable.set_reminder_asset
             } else {
-                holder.reminderAssetInactive
-            }
-            // set alarm icon depending on if the reminder is set or not
-            assetUrl?.let {
-                Glide.with(context).asDrawable().load(assetUrl).into(holder.ivAlert)
+                R.drawable.remove_reminder_asset
             }
 
+            val requestOptions = RequestOptions()
+            // set alarm icon depending on if the reminder is set or not
+            Glide.with(context)
+                    .load(drawable)
+                    .into(holder.ivAlert)
+
             // load image of the program
-            Glide.with(context).asDrawable().load(items[position].mediaGroups[0].mediaItems[0].src)
+            Glide.with(context)
+                    .setDefaultRequestOptions(requestOptions.placeholder(R.drawable.program_card_placeholder))
+                    .load(items[position].mediaGroups[0].mediaItems[0].src)
                     .into(holder.ivImage)
 
             // load logo of the channel
@@ -82,6 +87,11 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
             }
         } else {
             holder.ivAlert.visibility = View.VISIBLE
+            holder.itemView.setOnClickListener {
+                context?.let {
+                    toggleReminder(it, position, holder)
+                }
+            }
         }
 
         if (isLive && (PreferenceUtil.getInstance()
@@ -94,14 +104,24 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
 
         holder.ivAlert.setOnClickListener {
             context?.let {
-                if (AlarmManagerUtil.isAlarmSet(it, items[position].id)) {
-                    listener.removeReminder(items[position])
-                    Glide.with(context).asDrawable().load(holder.reminderAssetInactive).into(holder.ivAlert)
-                } else {
-                    listener.addReminder(items[position])
-                    Glide.with(context).asDrawable().load(holder.reminderAssetActive).into(holder.ivAlert)
-                }
+                toggleReminder(it, position, holder)
             }
+        }
+    }
+
+    private fun toggleReminder(context: Context, position: Int, holder: ProgramViewHolder) {
+        if (AlarmManagerUtil.isAlarmSet(context, items[position].id)) {
+            listener.removeReminder(items[position])
+            Glide.with(context)
+                    .load(R.drawable.remove_reminder_asset)
+                    .into(holder.ivAlert)
+            Toaster.makeToast(context, holder.removeReminderText)
+        } else {
+            listener.addReminder(items[position])
+            Glide.with(context)
+                    .load(R.drawable.set_reminder_asset)
+                    .into(holder.ivAlert)
+            Toaster.makeToast(context, holder.setReminderText)
         }
     }
 
@@ -120,8 +140,8 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvIsWatching = view.tv_is_watching
     var ivChannel = view.iv_channel
     var tvLiveEvent = view.tv_live_event
-    var reminderAssetActive: String? = null
-    var reminderAssetInactive: String? = null
+    var setReminderText: String? = null
+    var removeReminderText: String? = null
 
     init {
         tvProgramName.setTextColor(LiveSwitcherUtil.parseColor(
@@ -150,7 +170,13 @@ class ProgramViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvLiveEvent.setBackgroundColor(LiveSwitcherUtil.parseColor(
                 LiveSwitcherUtil.getParam(Constants.CONF_LIVE_EVENT_TAG_TEXT_BACKGROUND_COLOR)))
 
-        reminderAssetActive = LiveSwitcherUtil.getParam(Constants.CONF_REMINDER_ASSET_SELECTED)
-        reminderAssetInactive = LiveSwitcherUtil.getParam(CONF_REMINDER_ASSET)
+        LiveSwitcherUtil.getParam(Constants.CONF_SET_REMINDER_TEXT).let {
+            setReminderText = if(it != "null") { it } else { CustomApplication.getAppContext().getString(R.string.reminder_set) }
+        }
+
+        LiveSwitcherUtil.getParam(Constants.CONF_REMOVE_REMINDER_TEXT).let {
+            removeReminderText = if(it != "null") { it } else { CustomApplication.getAppContext().getString(R.string.reminder_removed) }
+        }
+
     }
 }
