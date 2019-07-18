@@ -219,18 +219,18 @@
         "type": "color_picker"
       },
       {
-        "key": "ls_reminder_asset_selected",
-        "label": "Reminder image when active",
-        "placeholder": "Reminder image when active",
-        "label_tooltip": "Reminder image when active",
-        "type": "uploader"
+        "key": "ls_set_reminder_text",
+        "label": "Text message showed to the user when actives a reminder.",
+        "placeholder": "Set reminder text",
+        "label_tooltip": "Set reminder text",
+        "type": "text_input"
       },
       {
-        "key": "ls_reminder_asset",
-        "label": "Reminder image when unactive",
-        "placeholder": "Reminder image when unactive",
-        "label_tooltip": "Reminder image when unactive",
-        "type": "uploader"
+        "key": "ls_remove_reminder_text",
+        "label": "Text message showed to the user when removes a reminder.",
+        "placeholder": "Remove reminder text",
+        "label_tooltip": "Remove reminder text",
+        "type": "text_input"
       }
     ]
   }
