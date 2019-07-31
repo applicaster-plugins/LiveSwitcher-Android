@@ -22,8 +22,9 @@ Besides the live channels, the live switcher will show the next programs sorted 
 
 ## Plugin configuration
 Here you can find in detail manner the fields and data available for configuration.
+
 | Key | Label | Type |
-| --- | ----- | ---- |
+| --- | --- | --- |
 | `ls_live_header_text` | Header text for live section | text input |
 | `ls_live_header_text_color` | Text color for the live header | color picker |
 | `ls_live_header_fontsize` | Font size of the live header text | text input |
