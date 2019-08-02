@@ -1,6 +1,8 @@
 package com.applicaster.liveswitcher.screen
 
 import android.content.DialogInterface
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -8,7 +10,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.applicaster.atom.model.APAtomEntry
+import com.applicaster.lesscodeutils.player.PlayerController
+import com.applicaster.lesscodeutils.player.PlayerControllerManager
 import com.applicaster.lesscodeutils.ui.AlertUtils.Companion.showAlertDialog
 import com.applicaster.liveswitcher.R
 import com.applicaster.liveswitcher.model.ChannelModel
@@ -45,9 +50,11 @@ import com.applicaster.util.OSUtil
 import com.applicaster.util.PreferenceUtil
 import com.applicaster.util.serialization.SerializationUtils
 import com.applicaster.util.ui.ImageHolderBuilder
+import com.applicaster.util.ui.Toaster
 import kotlinx.android.synthetic.main.fragment_live_switcher.*
 
 class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapter.OnProgramClickListener {
+
 
     var data: Any? = null
     var entries: List<APAtomEntry>? = null
@@ -56,6 +63,8 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
     var currentAtomEntry: APAtomEntry? = null
     var liveSwitcherPresenter: LiveSwitcherPresenter = LiveSwitcherPresenter(this,
             LiveSwitcherInteractor())
+
+    var playerController: PlayerController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_live_switcher, container,
@@ -66,9 +75,14 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
         super.onViewCreated(view, savedInstanceState)
         // set up view
         setUpView()
-
         // data has value when creating the fragment
         liveSwitcherPresenter.getAtoms(data)
+
+
+        playerController = PlayerControllerManager().getPlayerController()
+        playerController?.let {
+            Toaster.makeToast(context, "Player Controller created")
+        }
     }
 
     private fun setUpView() {
@@ -177,7 +191,7 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
 
         channelId?.let {
             val apChannel = APChannel()
-            apChannel.id = atomEntry.extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()
+            apChannel.id = it.toString()
             playerContract = playersManager.createPlayer(apChannel, context)
         } ?: run {
             playerContract = playersManager.createPlayer(atomEntry.playable, context)
@@ -221,6 +235,17 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
     override fun removeReminder(atomEntry: APAtomEntry) {
         context?.let {
             AlarmManagerUtil.removeIfExistsInReminder(it, atomEntry.id)
+        }
+    }
+
+    // todo: find a way to know when the orientation changes without having it enabled
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        // Checks the orientation of the screen
+        if (newConfig?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(context, "landscape", Toast.LENGTH_SHORT).show()
+        } else if (newConfig?.orientation == Configuration.ORIENTATION_PORTRAIT){
+            Toast.makeText(context, "portrait", Toast.LENGTH_SHORT).show()
         }
     }
 }
