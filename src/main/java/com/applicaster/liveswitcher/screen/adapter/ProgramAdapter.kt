@@ -17,7 +17,6 @@ import com.applicaster.liveswitcher.utils.Constants.PREFERENCE_ITEM_SELECTED_POS
 import com.applicaster.liveswitcher.utils.LiveSwitcherUtil
 import com.applicaster.util.AlarmManagerUtil
 import com.applicaster.util.PreferenceUtil
-import com.applicaster.util.StringUtil
 import com.applicaster.util.ui.Toaster
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -74,6 +73,9 @@ class ProgramAdapter(private val items: List<APAtomEntry>, private val channels:
             Glide.with(context).asDrawable().load(LiveSwitcherUtil.getChannelIconUrl(channels,
                     items[position].extensions?.get(EXTENSION_APPLICASTER_CHANNEL_ID).toString()))
                     .into(holder.ivChannel)
+
+            holder.ivChannel.layoutParams.width = LiveSwitcherUtil.getParam(Constants.CONF_LIVE_CHANNEL_ICON_WIDTH).toInt()
+            holder.ivChannel.layoutParams.height = LiveSwitcherUtil.getParam(Constants.CONF_LIVE_CHANNEL_ICON_HEIGHT).toInt()
         }
 
         // if it's live, don't show the alert icon
