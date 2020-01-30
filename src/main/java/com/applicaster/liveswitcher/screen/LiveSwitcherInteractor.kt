@@ -1,10 +1,7 @@
 package com.applicaster.liveswitcher.screen
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.applicaster.atom.model.APAtomEntry
-import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
 import com.google.gson.internal.LinkedTreeMap
