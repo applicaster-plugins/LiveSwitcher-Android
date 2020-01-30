@@ -8,6 +8,7 @@ import com.applicaster.atom.model.APAtomError
 import com.applicaster.atom.model.APAtomFeed
 import com.applicaster.jspipes.JSManager
 import com.google.gson.internal.LinkedTreeMap
+import rx.android.schedulers.AndroidSchedulers
 
 class LiveSwitcherInteractor {
 
@@ -19,21 +20,19 @@ class LiveSwitcherInteractor {
     fun getAtoms(data: Any?, onFinishedListener: OnFinishedListener) {
         if (data is LinkedTreeMap<*, *>) {
             val source = data["source"].toString()
-            Handler(Looper.getMainLooper()).post {
-                JSManager.getInstance().get(source, object : JSManager.JSManagerCallback {
-                    override fun onResult(atom: Any) {
+            JSManager
+                .getInstance()
+                .get(source)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    (it as? APAtomFeed?)?.let { atom ->
                         Log.d(this.javaClass.simpleName, "onResult")
-                        if (atom is APAtomFeed) {
-                            onFinishedListener.onGetAtomsSuccess(atom.entries, atom.extensions)
-                        }
+                        onFinishedListener.onGetAtomsSuccess(atom.entries, atom.extensions)
                     }
-
-                    override fun onError(error: APAtomError) {
-                        Log.d(this.javaClass.simpleName, "onError")
-                        onFinishedListener.onGetAtomsFail()
-                    }
+                }, {
+                    Log.d(this.javaClass.simpleName, "onError")
+                    onFinishedListener.onGetAtomsFail()
                 })
-            }
         }
     }
 }
