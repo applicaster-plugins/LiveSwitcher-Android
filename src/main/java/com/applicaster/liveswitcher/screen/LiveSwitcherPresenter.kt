@@ -1,24 +1,25 @@
 package com.applicaster.liveswitcher.screen
 
-import com.applicaster.atom.model.APAtomEntry
+import rx.Subscription
 
 class LiveSwitcherPresenter(private var liveSwitcherView: LiveSwitcherView?,
-                            private var liveSwitcherInteractor: LiveSwitcherInteractor)
-    : LiveSwitcherInteractor.OnFinishedListener {
+                            private var liveSwitcherInteractor: LiveSwitcherInteractor) {
+
+    var subscription: Subscription? = null
 
     fun getAtoms(data: Any?) {
         liveSwitcherView?.showProgress()
-        liveSwitcherInteractor.getAtoms(data, this)
+        subscription = liveSwitcherInteractor.getAtoms(data)
+                .subscribe({
+                    liveSwitcherView?.hideProgress()
+                    liveSwitcherView?.onAtomsFetchedSuccessfully(it.entries, it.extensions)
+                }, {
+                    liveSwitcherView?.hideProgress()
+                    liveSwitcherView?.onAtomsFetchedFail()
+                })
     }
 
-    override fun onGetAtomsSuccess(atomEntries: List<APAtomEntry>, extensions: Map<String, Any>) {
-        liveSwitcherView?.hideProgress()
-        liveSwitcherView?.onAtomsFetchedSuccessfully(atomEntries, extensions)
+    fun dispose() {
+        subscription?.unsubscribe()
     }
-
-    override fun onGetAtomsFail() {
-        liveSwitcherView?.hideProgress()
-        liveSwitcherView?.onAtomsFetchedFail()
-    }
-
 }

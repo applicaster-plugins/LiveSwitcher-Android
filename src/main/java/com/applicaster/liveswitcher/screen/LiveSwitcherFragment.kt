@@ -223,4 +223,9 @@ class LiveSwitcherFragment : HeartbeatFragment(), LiveSwitcherView, ProgramAdapt
             AlarmManagerUtil.removeIfExistsInReminder(it, atomEntry.id)
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        liveSwitcherPresenter.dispose()
+    }
 }
